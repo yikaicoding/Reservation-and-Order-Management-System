@@ -1,0 +1,94 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Admin.ManageTablesModel
+@{
+    ViewData["Title"] = "Manage Dining Tables";
+}
+
+<div class="container mt-4">
+    <h2>Dining Table Management</h2>
+    <hr />
+
+    <div class="row">
+        <!-- Form to Add a Table -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Add New Table</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewTable.TableNumber" class="form-label">Table Number / Label</label>
+                            <input asp-for="NewTable.TableNumber" class="form-control" placeholder="e.g. T-01 or VIP-1" />
+                            <span asp-validation-for="NewTable.TableNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewTable.DiningArea" class="form-label">Dining Area</label>
+                            <select asp-for="NewTable.DiningArea" class="form-select">
+                                <option value="">-- Select Dining Area --</option>
+                                <option value="Indoor Main Hall">Indoor Main Hall</option>
+                                <option value="Outdoor Terrace">Outdoor Terrace</option>
+                                <option value="VIP Room">VIP Room</option>
+                            </select>
+                            <span asp-validation-for="NewTable.DiningArea" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewTable.Capacity" class="form-label">Seating Capacity</label>
+                            <input asp-for="NewTable.Capacity" type="number" min="1" max="20" class="form-control" value="4" />
+                            <span asp-validation-for="NewTable.Capacity" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Save Table</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table List -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Configured Tables</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Table #</th>
+                                <th>Area</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Tables.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">No tables added yet. Add one using the form.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var table in Model.Tables)
+                                {
+                                    <tr>
+                                        <td><strong>@table.TableNumber</strong></td>
+                                        <td>@table.DiningArea</td>
+                                        <td>@table.Capacity Pax</td>
+                                        <td>
+                                            <span class="badge bg-success">@table.Status</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,28 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Reservation_and_Order_Management_System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Register Razor Pages & Session
 builder.Services.AddRazorPages();
+builder.Services.AddSession();
+
+// 2. Register Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddSession();
+
+// 3. Register Identity with Roles Support
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -18,8 +34,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseSession();
+
+// Authentication MUST be placed before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -28,7 +49,7 @@ app.MapRazorPages();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await Reservation_and_Order_Management_System.Data.DbInitializer.SeedRolesAndAdminAsync(services);
+    await DbInitializer.SeedRolesAndAdminAsync(services);
 }
 
 app.Run();
