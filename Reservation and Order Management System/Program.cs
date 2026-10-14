@@ -24,4 +24,11 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+// Seed default roles and admin account on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await Reservation_and_Order_Management_System.Data.DbInitializer.SeedRolesAndAdminAsync(services);
+}
+
 app.Run();
