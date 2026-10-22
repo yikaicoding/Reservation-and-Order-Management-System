@@ -1,0 +1,13 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Customer.DashboardModel
+
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="container mt-5">
+    <h2>Welcome, @Model.CustomerName!</h2>
+    <p class="text-muted">You are logged in.</p>
+
+    <a asp-page="/Customer/Logout" class="btn btn-outline-danger">Logout</a>
+</div>
