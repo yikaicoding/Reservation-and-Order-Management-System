@@ -20,6 +20,9 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
         [BindProperty]
         public string Password { get; set; } = string.Empty;
 
+        [BindProperty]
+        public bool RememberMe { get; set; }
+
         [TempData]
         public string? SuccessMessage { get; set; }
 
@@ -31,6 +34,13 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
             if (HttpContext.Session.GetInt32("CustomerId") != null)
             {
                 return RedirectToPage("/Customer/Dashboard");
+            }
+
+            //Remember me: fill in the saved email
+            if (Request.Cookies.TryGetValue("QDineEmail", out var savedEmail))
+            {
+                Email = savedEmail;
+                RememberMe = true;
             }
 
             return Page();
@@ -45,17 +55,32 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == Email && c.Password == Password);
+                .FirstOrDefaultAsync(c => c.Email == Email.Trim() && c.Password == Password);
 
             if (customer == null)
             {
-                ErrorMessage = "Invalid email or password";
+                ErrorMessage = "Invalid email or password.";
                 return Page();
             }
 
             //Store Customer ID and name in session
             HttpContext.Session.SetInt32("CustomerId", customer.CustomerId);
             HttpContext.Session.SetString("CustomerName", customer.FullName);
+
+            //Remember me: save email (never the password) for 30 days
+            if (RememberMe)
+            {
+                Response.Cookies.Append("QDineEmail", customer.Email, new CookieOptions
+                {
+                    Expires = DateTimeOffset.Now.AddDays(30),
+                    HttpOnly = true,
+                    IsEssential = true
+                });
+            }
+            else
+            {
+                Response.Cookies.Delete("QDineEmail");
+            }
 
             //Go to Customer Dashboard
             return RedirectToPage("/Customer/Dashboard");
