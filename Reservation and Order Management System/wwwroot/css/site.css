@@ -1,0 +1,79 @@
+﻿/* ===== QDine colours (shared by the whole team) ===== */
+:root {
+    --qd-blue: #1463ff;
+    --qd-blue-dark: #0a3a9e;
+    --qd-orange: #ff9500;
+    --qd-orange-dark: #f08a00;
+    --qd-field: #f5f7fb;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Blue gradient background */
+.qd-bg-blue {
+    background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
+}
+
+/* Logo */
+.qd-logo {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+}
+
+    .qd-logo i {
+        color: var(--qd-orange);
+    }
+
+/* Orange button */
+.btn-qd {
+    background: var(--qd-orange);
+    color: #fff;
+    font-weight: 700;
+    border: 0;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+    .btn-qd:hover {
+        background: var(--qd-orange-dark);
+        color: #fff;
+    }
+
+/* Rounded grey inputs with icon */
+.qd-input .input-group-text,
+.qd-input .form-control,
+.qd-input .form-select {
+    background: var(--qd-field);
+    border-color: #e2e8f0;
+}
+
+.qd-input .input-group-text {
+    color: var(--qd-blue);
+    border-radius: 10px 0 0 10px;
+}
+
+.qd-input .form-control:last-child,
+.qd-input .btn:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.qd-input .form-control:focus {
+    box-shadow: none;
+    border-color: var(--qd-blue);
+}
+
+/* Orange text highlight */
+.text-qd-orange {
+    color: var(--qd-orange);
+}
+
+/* Card shadow */
+.qd-card {
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(2, 18, 64, 0.2);
+}
