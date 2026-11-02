@@ -1,0 +1,16 @@
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+public class VoucherModel : PageModel
+{
+    public string BookingId { get; set; }
+    public string CustomerName { get; set; }
+    public string ReservationDate { get; set; }
+    public string ReservationTime { get; set; }
+    public int GuestCount { get; set; }
+    public string TableNumber { get; set; }
+
+    public void OnGet()
+    {
+   
+    }
+}

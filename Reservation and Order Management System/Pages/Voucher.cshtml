@@ -1,0 +1,34 @@
+﻿@page
+@model VoucherModel
+
+@{
+    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+
+    ViewData["Title"] = "Reservation Voucher";
+    ViewData["HeaderTitle"] = "Reservation Voucher";
+    ViewData["HeaderSubtitle"] = "Present this voucher upon arrival.";
+}
+
+<div class="card shadow-sm p-5 mx-auto" style="max-width:600px;">
+
+    <div class="text-center">
+        <h2>QDine</h2>
+        <h4>Reservation Voucher</h4>
+    </div>
+
+    <hr />
+
+    <p><strong>Booking ID:</strong> @Model.BookingId</p>
+    <p><strong>Customer:</strong> @Model.CustomerName</p>
+    <p><strong>Date:</strong> @Model.ReservationDate</p>
+    <p><strong>Time:</strong> @Model.ReservationTime</p>
+    <p><strong>Guests:</strong> @Model.GuestCount</p>
+    <p><strong>Table:</strong> @Model.TableNumber</p>
+
+    <hr />
+
+    <p class="text-center text-muted">
+        Thank you for choosing QDine.
+    </p>
+
+</div>

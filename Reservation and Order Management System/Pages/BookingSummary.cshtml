@@ -1,0 +1,41 @@
+﻿@page
+@model BookingSummaryModel
+
+@{
+    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+
+    ViewData["Title"] = "Booking Summary";
+    ViewData["HeaderTitle"] = "Booking Summary";
+    ViewData["HeaderSubtitle"] = "Review your reservation details before continuing.";
+}
+
+<div class="card shadow-sm p-4">
+
+    <h3>Reservation Details</h3>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Date:</strong> @Model.ReservationDate</p>
+            <p><strong>Time:</strong> @Model.ReservationTime</p>
+            <p><strong>Guests:</strong> @Model.GuestCount</p>
+        </div>
+
+        <div class="col-md-6">
+            <p><strong>Table:</strong> @Model.TableNumber</p>
+            <p><strong>Status:</strong> @Model.Status</p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <strong>Special Request</strong>
+        <p>@Model.SpecialRequest</p>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a class="btn btn-primary" asp-page="/Reservations/ReviewBooking">
+            Continue
+        </a>
+    </div>
+
+</div>

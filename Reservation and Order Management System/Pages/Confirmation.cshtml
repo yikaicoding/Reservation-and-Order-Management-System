@@ -1,0 +1,36 @@
+﻿@page
+@model ConfirmationModel
+
+@{
+    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+
+    ViewData["Title"] = "Confirmation";
+    ViewData["HeaderTitle"] = "Reservation Confirmed";
+    ViewData["HeaderSubtitle"] = "Your booking has been successfully created.";
+}
+
+<div class="card shadow-sm p-5 text-center">
+
+    <h1 class="text-success">
+        ✓
+    </h1>
+
+    <h2>Reservation Confirmed</h2>
+
+    <p class="lead">
+        Booking Reference:
+        <strong>@Model.BookingId</strong>
+    </p>
+
+    <hr />
+
+    <p>Date: @Model.ReservationDate</p>
+    <p>Time: @Model.ReservationTime</p>
+    <p>Table: @Model.TableNumber</p>
+
+    <a asp-page="/Reservations/Voucher"
+       class="btn btn-primary">
+        View Voucher
+    </a>
+
+</div>
