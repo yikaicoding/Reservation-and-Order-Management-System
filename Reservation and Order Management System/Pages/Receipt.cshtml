@@ -1,0 +1,106 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Payments.ReceiptModel
+
+@{
+    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+
+    ViewData["Title"] = "Payment Receipt";
+    ViewData["HeaderTitle"] = "Official Payment Receipt";
+    ViewData["HeaderSubtitle"] = "Proof of payment.";
+}
+
+<div class="card shadow-sm mx-auto"
+     style="max-width:800px;">
+
+    <div class="card-body">
+
+        <div class="text-center">
+
+            <h2>QDine</h2>
+            <h5>Official Payment Receipt</h5>
+
+        </div>
+
+        <hr />
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <p>
+                    <strong>Receipt No:</strong>
+                    @Model.ReceiptNumber
+                </p>
+
+                <p>
+                    <strong>Transaction Ref:</strong>
+                    @Model.TransactionReference
+                </p>
+
+                <p>
+                    <strong>Booking Ref:</strong>
+                    @Model.BookingReference
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <p>
+                    <strong>Payment Date:</strong>
+                    @Model.PaymentDate
+                </p>
+
+                <p>
+                    <strong>Payment Method:</strong>
+                    @Model.PaymentMethod
+                </p>
+
+            </div>
+
+        </div>
+
+        <hr />
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-end">Amount (RM)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Reservation Deposit</td>
+                    <td class="text-end">
+                        @Model.Amount
+                    </td>
+                </tr>
+
+            </tbody>
+
+            <tfoot>
+
+                <tr>
+                    <th>Total Paid</th>
+                    <th class="text-end">
+                        RM @Model.Amount
+                    </th>
+                </tr>
+
+            </tfoot>
+
+        </table>
+
+        <div class="alert alert-success">
+
+            Payment Completed Successfully
+
+        </div>
+
+    </div>
+
+</div>
