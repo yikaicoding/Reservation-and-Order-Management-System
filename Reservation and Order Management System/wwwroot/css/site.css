@@ -77,3 +77,104 @@ body {
     border-radius: 14px;
     box-shadow: 0 16px 40px rgba(2, 18, 64, 0.2);
 }
+
+/* ===== Booking stepper ===== */
+.qd-stepper {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+.qd-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+    .qd-step span {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: #64748b;
+    }
+
+    .qd-step.done {
+        opacity: 1;
+    }
+
+        .qd-step.done span {
+            background: #16a34a;
+            color: #fff;
+        }
+
+    .qd-step.active {
+        opacity: 1;
+    }
+
+        .qd-step.active span {
+            border: 3px solid var(--qd-orange);
+            color: var(--qd-ink, #0f172a);
+        }
+
+/* Cards sit over the blue banner */
+.qd-overlap {
+    margin-top: -30px;
+    padding-bottom: 40px;
+}
+
+/* Selectable chips */
+.qd-chip {
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: #fff;
+    color: #475569;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+}
+
+.btn-check:checked + .qd-chip {
+    background: #eef4ff;
+    border-color: var(--qd-blue);
+    color: var(--qd-blue);
+    font-weight: 600;
+}
+
+.btn-check:checked + .qd-chip-orange {
+    background: #fff7e8;
+    border-color: var(--qd-orange);
+    color: #b45309;
+}
+
+/* Selected table badge */
+.qd-table-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff7e8;
+    border: 1px solid #ffe2b0;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+    .qd-table-badge span {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--qd-orange);
+        color: #fff;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+    }
+
+.qd-nav-link.active {
+    background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
+    color: #fff;
+}
