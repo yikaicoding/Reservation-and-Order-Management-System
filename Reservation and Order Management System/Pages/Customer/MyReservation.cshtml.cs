@@ -25,6 +25,9 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
 
         public int TotalVisits { get; set; }
 
+        //US12 - ReservationId -> overall star rating (for visits already reviewed)
+        public Dictionary<int, int> Ratings { get; set; } = new Dictionary<int, int>();
+
         [TempData]
         public string? SuccessMessage { get; set; }
 
@@ -74,6 +77,13 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
             {
                 Filter = "All";
             }
+
+            //US12 - Load ratings for reviewed visits
+            var ids = reservations.Select(r => r.ReservationId).ToList();
+
+            Ratings = await _context.Reviews
+                .Where(rv => ids.Contains(rv.ReservationId))
+                .ToDictionaryAsync(rv => rv.ReservationId, rv => rv.OverallRating);
 
             return Page();
         }

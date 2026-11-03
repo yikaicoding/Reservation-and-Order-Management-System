@@ -78,6 +78,143 @@ body {
     box-shadow: 0 16px 40px rgba(2, 18, 64, 0.2);
 }
 
+/* Cards lift up on hover */
+.qd-hover-lift {
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+    .qd-hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 44px rgba(2, 18, 64, 0.25);
+    }
+
+/* ===== Sidebar (customer pages) ===== */
+.qd-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    border-right: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.qd-logo-blue {
+    display: inline-block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--qd-blue);
+    text-decoration: none;
+}
+
+    .qd-logo-blue:hover {
+        color: var(--qd-blue-dark);
+    }
+
+    .qd-logo-blue i {
+        color: var(--qd-orange);
+    }
+
+/* Menu buttons */
+.qd-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+    .qd-nav-link i {
+        font-size: 1.15rem;
+        width: 22px;
+        text-align: center;
+        color: #64748b;
+        transition: color 0.15s;
+    }
+
+    /* Hover: light blue + slide */
+    .qd-nav-link:hover {
+        background: #eef4ff;
+        color: var(--qd-blue);
+        transform: translateX(3px);
+    }
+
+        .qd-nav-link:hover i {
+            color: var(--qd-blue);
+        }
+
+    /* Current page: blue gradient */
+    .qd-nav-link.active {
+        background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(20, 99, 255, 0.3);
+    }
+
+        .qd-nav-link.active i {
+            color: #fff;
+        }
+
+        .qd-nav-link.active:hover {
+            transform: none;
+        }
+
+    /* Log out: red */
+    .qd-nav-link.text-danger i {
+        color: #dc2626;
+    }
+
+    .qd-nav-link.text-danger:hover {
+        background: #fef2f2;
+        color: #dc2626 !important;
+    }
+
+    /* Keyboard focus outline */
+    .qd-nav-link:focus-visible {
+        outline: 2px solid var(--qd-blue);
+        outline-offset: 2px;
+    }
+
+/* Hide sidebar on phones */
+@media (max-width: 768px) {
+    .qd-sidebar {
+        display: none !important;
+    }
+}
+
+/* ===== Banner ===== */
+
+/* Cards sit over the blue banner */
+.qd-overlap {
+    margin-top: -30px;
+    padding-bottom: 40px;
+}
+
+/* Taller banner (dashboard) */
+.qd-banner-tall {
+    padding-bottom: 90px;
+}
+
+.qd-overlap-lg {
+    margin-top: -60px;
+}
+
+/* Decorative circle in banner */
+.qd-banner-circle {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: -120px;
+    right: -60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+}
+
 /* ===== Booking stepper ===== */
 .qd-stepper {
     display: flex;
@@ -120,14 +257,10 @@ body {
 
         .qd-step.active span {
             border: 3px solid var(--qd-orange);
-            color: var(--qd-ink, #0f172a);
+            color: #0f172a;
         }
 
-/* Cards sit over the blue banner */
-.qd-overlap {
-    margin-top: -30px;
-    padding-bottom: 40px;
-}
+/* ===== Chips & badges ===== */
 
 /* Selectable chips */
 .qd-chip {
@@ -152,6 +285,13 @@ body {
     color: #b45309;
 }
 
+/* Orange dietary pill */
+.qd-pill-orange {
+    background: #fff7e8;
+    color: #b45309;
+    border: 1px solid #ffe2b0;
+}
+
 /* Selected table badge */
 .qd-table-badge {
     display: flex;
@@ -174,14 +314,153 @@ body {
         place-items: center;
     }
 
-.qd-nav-link.active {
-    background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
-    color: #fff;
+/* ===== Star rating ===== */
+.qd-stars {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 2px;
 }
 
-/* Orange dietary pill */
-.qd-pill-orange {
+    .qd-stars input {
+        display: none;
+    }
+
+    .qd-stars label {
+        font-size: 1.9rem;
+        line-height: 1;
+        color: #d1d5db;
+        cursor: pointer;
+    }
+
+        .qd-stars input:checked ~ label,
+        .qd-stars label:hover,
+        .qd-stars label:hover ~ label {
+            color: var(--qd-orange);
+        }
+
+/* ===== Dashboard ===== */
+
+/* Icon tiles */
+.qd-stat-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    font-size: 1.7rem;
+    background: #eef4ff;
+    color: var(--qd-blue);
+}
+
+    .qd-stat-icon.orange {
+        background: #fff7e8;
+        color: var(--qd-orange);
+    }
+
+    .qd-stat-icon.green {
+        background: #ecfdf5;
+        color: #16a34a;
+    }
+
+    .qd-stat-icon.purple {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+/* Big stat number */
+.qd-stat-number {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+/* Calendar date block */
+.qd-date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 140px;
+    min-height: 160px;
+    border-radius: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
+    box-shadow: 0 8px 20px rgba(20, 99, 255, 0.3);
+}
+
+    .qd-date-block strong {
+        font-size: 3.6rem;
+        line-height: 1;
+    }
+
+    .qd-date-block small {
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0.85;
+    }
+
+    /* Small version (recent activity) */
+    .qd-date-block.sm {
+        width: 56px;
+        min-height: 62px;
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+        .qd-date-block.sm strong {
+            font-size: 1.4rem;
+        }
+
+        .qd-date-block.sm small {
+            font-size: 0.65rem;
+        }
+
+/* "IN 28 DAYS" pill */
+.qd-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #eef4ff;
+    color: var(--qd-blue);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+/* Time / Guests / Table tiles */
+.qd-info-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+    .qd-info-tile i {
+        font-size: 1.4rem;
+        color: var(--qd-blue);
+    }
+
+    .qd-info-tile small {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .qd-info-tile strong {
+        font-size: 1.25rem;
+    }
+
+/* Review prompt card */
+.qd-review-prompt {
     background: #fff7e8;
-    color: #b45309;
     border: 1px solid #ffe2b0;
+    border-radius: 14px;
+    padding: 28px;
 }
