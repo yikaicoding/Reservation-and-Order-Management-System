@@ -178,3 +178,10 @@ body {
     background: linear-gradient(135deg, var(--qd-blue), var(--qd-blue-dark));
     color: #fff;
 }
+
+/* Orange dietary pill */
+.qd-pill-orange {
+    background: #fff7e8;
+    color: #b45309;
+    border: 1px solid #ffe2b0;
+}
