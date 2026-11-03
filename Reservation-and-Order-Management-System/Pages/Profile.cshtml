@@ -1,0 +1,242 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.ProfileModel
+@{
+    ViewData["Title"] = "Profile & Settings";
+    ViewData["BodyClass"] = "profile-page";
+    var displayName = string.IsNullOrWhiteSpace(Model.Input.FullName)
+        ? "there"
+        : Model.Input.FullName.Split(' ')[0];
+    var avatarLetter = displayName[..1].ToUpperInvariant();
+    var accountEmail = User.Identity?.Name ?? "Signed-in account";
+}
+
+<div class="profile-app">
+    <aside class="profile-sidebar" aria-label="Main navigation">
+        <a class="profile-brand" asp-page="/Index" aria-label="Q Dine home">
+            <span class="brand-mark">Q</span>
+            <span>Q<span class="brand-light">Dine</span></span>
+        </a>
+
+        <div class="sidebar-label">YOUR ACCOUNT</div>
+        <nav class="profile-nav">
+            <a asp-page="/Index"><span class="nav-icon">⌂</span><span>Home</span></a>
+            <a asp-page="/Reservations/Create"><span class="nav-icon">▦</span><span>Reservations</span></a>
+            <a asp-page="/Orders/Create"><span class="nav-icon">♧</span><span>Order food</span></a>
+            <a class="active" asp-page="/Profile" aria-current="page">
+                <span class="nav-icon">⚙</span><span>Profile &amp; Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-user">
+            <span class="user-avatar">@avatarLetter</span>
+            <span class="sidebar-user-copy">
+                <strong>@(string.IsNullOrWhiteSpace(Model.Input.FullName) ? "Your profile" : Model.Input.FullName)</strong>
+                <small>@accountEmail</small>
+            </span>
+        </div>
+
+        <form method="post" asp-page="/Account/Logout" class="sidebar-logout">
+            <button type="submit"><span class="nav-icon">↪</span>Log out</button>
+        </form>
+    </aside>
+
+    <main class="profile-main">
+        <section class="profile-hero">
+            <div class="hero-copy">
+                <span class="eyebrow"><span class="eyebrow-dot"></span> YOUR QDINE PROFILE</span>
+                <h1>Good evening, @displayName.</h1>
+                <p>Keep your details and dining preferences just the way you like them.</p>
+            </div>
+
+            <div class="hero-account">
+                <span class="hero-avatar">@avatarLetter</span>
+                <span>
+                    <strong>@Model.Input.FullName</strong>
+                    <small>@accountEmail</small>
+                </span>
+                <span class="verified-pill"><span>✓</span> MEMBER</span>
+            </div>
+
+            <span class="hero-orb hero-orb-one"></span>
+            <span class="hero-orb hero-orb-two"></span>
+        </section>
+
+        <div class="profile-content">
+            <div class="profile-heading-row">
+                <div>
+                    <h2>Profile &amp; settings</h2>
+                    <p>Manage your personal details and dining experience.</p>
+                </div>
+                <div class="secure-label"><span>✓</span> ACCOUNT PROTECTED</div>
+            </div>
+
+            <form method="post" class="profile-form">
+                <div asp-validation-summary="ModelOnly" class="profile-validation" role="alert"></div>
+
+                <div class="profile-columns">
+                    <div class="profile-primary-column">
+                        <section class="profile-card">
+                            <div class="card-heading">
+                                <span class="card-icon blue-icon">♙</span>
+                                <div>
+                                    <h3>Personal information</h3>
+                                    <p>These details help us personalize bookings and receipts.</p>
+                                </div>
+                            </div>
+
+                            <div class="field-grid">
+                                <div class="profile-field">
+                                    <label asp-for="Input.FullName">Full name</label>
+                                    <input asp-for="Input.FullName" autocomplete="name" placeholder="Your full name" />
+                                    <span asp-validation-for="Input.FullName"></span>
+                                </div>
+
+                                <div class="profile-field">
+                                    <label>Email address</label>
+                                    <input value="@accountEmail" readonly aria-readonly="true" />
+                                    <small>Managed by your sign-in account</small>
+                                </div>
+
+                                <div class="profile-field">
+                                    <label asp-for="Input.Phone">Mobile number</label>
+                                    <input asp-for="Input.Phone" autocomplete="tel" placeholder="+60 12 345 6789" />
+                                    <span asp-validation-for="Input.Phone"></span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="profile-card dining-card">
+                            <div class="card-heading">
+                                <span class="card-icon violet-icon">♜</span>
+                                <div>
+                                    <h3>Dining preferences</h3>
+                                    <p>We’ll keep these notes with your profile for future visits.</p>
+                                </div>
+                                <span class="saved-label">SAVED FOR NEXT VISIT</span>
+                            </div>
+
+                            <div class="profile-field">
+                                <label asp-for="Input.DietaryPreferences">Dietary requirements / allergies</label>
+                                <textarea asp-for="Input.DietaryPreferences" rows="2"
+                                          placeholder="For example: vegetarian, nut allergy, gluten-free"></textarea>
+                                <span asp-validation-for="Input.DietaryPreferences"></span>
+                            </div>
+
+                            <div class="profile-field notes-field">
+                                <label asp-for="Input.AccessibilityNotes">Seating or accessibility notes</label>
+                                <textarea asp-for="Input.AccessibilityNotes" rows="2"
+                                          placeholder="Anything that would make your visit more comfortable"></textarea>
+                                <span asp-validation-for="Input.AccessibilityNotes"></span>
+                            </div>
+
+                            <div class="note-hint">
+                                <span>ⓘ</span>
+                                Please mention urgent allergy information to your server as well.
+                            </div>
+                        </section>
+
+                        <section class="profile-card reservation-card">
+                            <div class="card-heading">
+                                <span class="card-icon mint-icon">▦</span>
+                                <div>
+                                    <h3>Reservation details</h3>
+                                    <p>Choose your party size, date and time when you book.</p>
+                                </div>
+                            </div>
+                            <a class="booking-link" asp-page="/Reservations/Create">
+                                Make a reservation <span>→</span>
+                            </a>
+                        </section>
+                    </div>
+
+                    <div class="profile-secondary-column">
+                        <section class="profile-card account-card">
+                            <div class="card-heading">
+                                <span class="card-icon blue-icon">♧</span>
+                                <div>
+                                    <h3>Your account</h3>
+                                    <p>Details used to manage your visits.</p>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <span class="setting-symbol">✉</span>
+                                <div><strong>Sign-in email</strong><small>@accountEmail</small></div>
+                                <span class="status-dot" title="Signed in"></span>
+                            </div>
+
+                            <div class="setting-row">
+                                <span class="setting-symbol">▦</span>
+                                <div><strong>Reservations</strong><small>Book and manage your visits</small></div>
+                                <a asp-page="/Reservations/Create" class="row-action">Open</a>
+                            </div>
+
+                            <div class="setting-row">
+                                <span class="setting-symbol">♧</span>
+                                <div><strong>Food orders</strong><small>Order for a confirmed reservation</small></div>
+                                <a asp-page="/Orders/Create" class="row-action">Open</a>
+                            </div>
+                        </section>
+
+                        <section class="profile-card privacy-card">
+                            <div class="card-heading">
+                                <span class="card-icon orange-icon">◇</span>
+                                <div>
+                                    <h3>Privacy</h3>
+                                    <p>How your profile details are used.</p>
+                                </div>
+                            </div>
+
+                            <div class="privacy-item">
+                                <span class="privacy-check">✓</span>
+                                <div>
+                                    <strong>Personalized experience</strong>
+                                    <small>Your saved preferences help staff prepare for your visit.</small>
+                                </div>
+                            </div>
+
+                            <div class="privacy-item">
+                                <span class="privacy-check">✓</span>
+                                <div>
+                                    <strong>Reservation updates</strong>
+                                    <small>Your contact details are used for reservation-related communication.</small>
+                                </div>
+                            </div>
+
+                            <a asp-page="/Privacy" class="privacy-link">
+                                Read our privacy information <span>→</span>
+                            </a>
+                        </section>
+
+                        <div class="profile-help">
+                            <span class="help-icon">?</span>
+                            <span>
+                                <strong>Need to change your account email?</strong>
+                                <small>Contact the restaurant team for help.</small>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-savebar">
+                    <span class="save-status">
+                        <span class="status-dot"></span>
+                        Your profile is up to date. Changes apply to future reservations.
+                    </span>
+                    <div class="save-actions">
+                        <button type="reset" class="button-secondary">Discard changes</button>
+                        <button type="submit" class="button-save">
+                            <span>Save profile</span><span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
