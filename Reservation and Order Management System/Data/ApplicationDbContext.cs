@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Data
 {
@@ -9,6 +10,6 @@ namespace Reservation_and_Order_Management_System.Data
         {
         }
 
-        
+        public DbSet<Customer> Customers { get; set; }
     }
 }
