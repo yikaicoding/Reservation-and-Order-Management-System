@@ -1,0 +1,146 @@
+﻿@page "{id:int}"
+@model Reservation_and_Order_Management_System.Pages.Customer.ReviewModel
+
+@{
+    Layout = null;
+
+    //Rating categories: (field name, label, icon, current value)
+    var categories = new (string Field, string Label, string Icon, int Value)[]
+    {
+        ("FoodRating", "Food", "bi-egg-fried", Model.FoodRating),
+        ("ServiceRating", "Service", "bi-person-check", Model.ServiceRating),
+        ("AmbienceRating", "Ambience", "bi-lamp", Model.AmbienceRating),
+        ("OverallRating", "Overall", "bi-star", Model.OverallRating)
+    };
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Leave a Review - QDine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+
+        <!-- ===== Sidebar ===== -->
+        <nav class="qd-sidebar bg-white d-flex flex-column p-3">
+
+            <a class="qd-logo-blue mb-4 px-2" asp-page="/Customer/Dashboard">
+                <i class="bi bi-fork-knife"></i> QDine
+            </a>
+
+            <a class="qd-nav-link" asp-page="/Customer/Dashboard"><i class="bi bi-house"></i> Home</a>
+            <a class="qd-nav-link" asp-page="/Customer/Menu"><i class="bi bi-grid"></i> Menu</a>
+            <a class="qd-nav-link" asp-page="/Customer/ReserveTable"><i class="bi bi-book"></i> Reservation</a>
+            <a class="qd-nav-link" asp-page="/Customer/Cart"><i class="bi bi-cart"></i> Cart</a>
+            <a class="qd-nav-link active" asp-page="/Customer/MyReservation"><i class="bi bi-clock-history"></i> Order History</a>
+
+            <div class="mt-auto">
+                <a class="qd-nav-link" asp-page="/Customer/Profile"><i class="bi bi-gear"></i> Profile &amp; Settings</a>
+                <a class="qd-nav-link text-danger" asp-page="/Customer/Logout"><i class="bi bi-box-arrow-left"></i> Log out</a>
+            </div>
+        </nav>
+
+
+        <!-- ===== Main ===== -->
+        <main class="flex-grow-1">
+
+            <!-- Blue banner -->
+            <div class="qd-bg-blue text-white px-5 pt-5 pb-5">
+                <span class="badge rounded-pill bg-white bg-opacity-25 mb-3">
+                    <i class="bi bi-chat-heart"></i> YOUR FEEDBACK
+                </span>
+                <h1 class="fw-bold">How was your visit?</h1>
+                <p class="fs-5 mb-0">Your rating helps us make every table better.</p>
+            </div>
+
+            <div class="container-fluid px-4 qd-overlap">
+                <form method="post">
+                    <div class="row g-4">
+
+                        <!-- ===== Rating card ===== -->
+                        <div class="col-lg-8">
+                            <div class="card qd-card">
+                                <div class="card-body p-4">
+
+                                    <h4 class="fw-bold mb-1">Rate your experience</h4>
+                                    <p class="text-muted small mb-3">Tap the stars, 1 is poor and 5 is excellent.</p>
+
+                                    <div asp-validation-summary="All" class="text-danger small mb-2"></div>
+
+                                    @foreach (var c in categories)
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                                            <span class="fw-semibold">
+                                                <i class="bi @c.Icon text-primary me-2"></i>@c.Label
+                                            </span>
+
+                                            <!-- Stars (shown 5 to 1 so hover fills the right way) -->
+                                            <div class="qd-stars">
+                                                @for (int i = 5; i >= 1; i--)
+                                                {
+                                                    <input type="radio" name="@c.Field" id="@(c.Field)_@i" value="@i"
+                                                           checked="@(c.Value == i)" />
+                                                    <label for="@(c.Field)_@i" title="@i star@(i > 1 ? "s" : "")">★</label>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <!-- Comment -->
+                                    <div class="mt-4">
+                                        <label asp-for="Comment" class="form-label fw-bold">Comments (optional)</label>
+                                        <textarea asp-for="Comment" class="form-control" rows="4" maxlength="500"
+                                                  placeholder="Tell us what you loved or what we can improve."></textarea>
+                                        <span asp-validation-for="Comment" class="text-danger small"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ===== Visit summary card ===== -->
+                        <div class="col-lg-4">
+                            <div class="card qd-card">
+                                <div class="card-body p-4">
+
+                                    <h4 class="fw-bold mb-1">Your visit</h4>
+                                    <p class="text-muted small mb-4">The reservation you're reviewing.</p>
+
+                                    <p class="mb-2"><i class="bi bi-calendar3 text-primary me-2"></i>@Model.Reservation.ReservationDate.ToString("dddd, d MMMM yyyy")</p>
+                                    <p class="mb-2"><i class="bi bi-clock text-primary me-2"></i>@DateTime.Today.Add(Model.Reservation.ReservationTime).ToString("h:mm tt")</p>
+                                    <p class="mb-3"><i class="bi bi-people text-primary me-2"></i>@Model.Reservation.NumberOfGuests people</p>
+
+                                    <div class="qd-table-badge mb-4">
+                                        <span>T@(Model.Reservation.RestaurantTableId.ToString("00"))</span>
+                                        <div>
+                                            <small class="text-qd-orange fw-bold">YOUR TABLE</small>
+                                            <div class="fw-bold">Table @Model.Reservation.RestaurantTableId</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <a asp-page="/Customer/MyReservation" class="btn btn-outline-primary flex-fill">Cancel</a>
+                                        <button type="submit" class="btn btn-qd flex-fill">Submit review</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

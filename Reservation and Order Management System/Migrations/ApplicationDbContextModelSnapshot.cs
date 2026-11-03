@@ -109,6 +109,44 @@ namespace Reservation_and_Order_Management_System.Migrations
                     b.ToTable("Reservations");
                 });
 
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Review", b =>
+                {
+                    b.Property<int>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
+
+                    b.Property<int>("AmbienceRating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FoodRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OverallRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceRating")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("ReservationId")
+                        .IsUnique();
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Reservation", b =>
                 {
                     b.HasOne("Reservation_and_Order_Management_System.Models.Customer", "Customer")
@@ -118,6 +156,17 @@ namespace Reservation_and_Order_Management_System.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Review", b =>
+                {
+                    b.HasOne("Reservation_and_Order_Management_System.Models.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
                 });
 #pragma warning restore 612, 618
         }

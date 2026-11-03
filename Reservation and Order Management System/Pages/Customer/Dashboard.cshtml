@@ -27,82 +27,294 @@
                 <i class="bi bi-fork-knife"></i> QDine
             </a>
 
-            <a class="qd-nav-link" asp-page="/Customer/Menu">
-                <i class="bi bi-grid"></i> Menu
-            </a>
-            <a class="qd-nav-link" asp-page="/Customer/ReserveTable">
-                <i class="bi bi-book"></i> Reservation
-            </a>
-            <a class="qd-nav-link" asp-page="/Customer/Cart">
-                <i class="bi bi-cart"></i> Cart
-            </a>
-            <a class="qd-nav-link" asp-page="/Customer/MyReservation">
-                <i class="bi bi-clock-history"></i> Order History
-            </a>
+            <a class="qd-nav-link active" asp-page="/Customer/Dashboard"><i class="bi bi-house"></i> Home</a>
+            <a class="qd-nav-link" asp-page="/Customer/Menu"><i class="bi bi-grid"></i> Menu</a>
+            <a class="qd-nav-link" asp-page="/Customer/ReserveTable"><i class="bi bi-book"></i> Reservation</a>
+            <a class="qd-nav-link" asp-page="/Customer/Cart"><i class="bi bi-cart"></i> Cart</a>
+            <a class="qd-nav-link" asp-page="/Customer/MyReservation"><i class="bi bi-clock-history"></i> Order History</a>
 
             <div class="mt-auto">
-                <a class="qd-nav-link" asp-page="/Customer/Profile">
-                    <i class="bi bi-gear"></i> Profile &amp; Settings
-                </a>
-                <a class="qd-nav-link text-danger" asp-page="/Customer/Logout">
-                    <i class="bi bi-box-arrow-left"></i> Log out
-                </a>
+                <a class="qd-nav-link" asp-page="/Customer/Profile"><i class="bi bi-gear"></i> Profile &amp; Settings</a>
+                <a class="qd-nav-link text-danger" asp-page="/Customer/Logout"><i class="bi bi-box-arrow-left"></i> Log out</a>
             </div>
         </nav>
 
 
-        <!-- ===== Main content ===== -->
+        <!-- ===== Main ===== -->
         <main class="flex-grow-1">
 
             <!-- Blue banner -->
-            <div class="qd-bg-blue text-white p-5">
+            <div class="qd-bg-blue text-white px-5 pt-5 qd-banner-tall position-relative overflow-hidden">
+                <div class="qd-banner-circle"></div>
+
                 <span class="badge rounded-pill bg-white bg-opacity-25 mb-3">
                     <i class="bi bi-person"></i> YOUR QDINE ACCOUNT
                 </span>
-                <h1 class="fw-bold">@Model.Greeting, @Model.CustomerName.</h1>
-                <p class="fs-5 mb-0">What would you like to do today?</p>
+                <h1 class="fw-bold display-5">@Model.Greeting, @Model.CustomerName.</h1>
+                <p class="fs-5 mb-0 opacity-75">What would you like to do today?</p>
             </div>
 
-            <!-- Quick action cards -->
-            <div class="container-fluid p-4">
+            <div class="container-fluid px-5 qd-overlap-lg pb-5">
+
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success">@Model.SuccessMessage</div>
+                }
+
+
+                <!-- ===== Stats row ===== -->
+                <div class="row g-4 mb-5">
+
+                    <div class="col-md-4">
+                        <div class="card qd-card h-100">
+                            <div class="card-body p-4 d-flex align-items-center gap-4">
+                                <span class="qd-stat-icon lg"><i class="bi bi-calendar-check"></i></span>
+                                <div>
+                                    <div class="qd-stat-number">@Model.UpcomingCount</div>
+                                    <div class="fw-semibold text-muted">Upcoming bookings</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card qd-card h-100">
+                            <div class="card-body p-4 d-flex align-items-center gap-4">
+                                <span class="qd-stat-icon lg green"><i class="bi bi-cup-hot"></i></span>
+                                <div>
+                                    <div class="qd-stat-number">@Model.TotalVisits</div>
+                                    <div class="fw-semibold text-muted">Visits so far</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card qd-card h-100">
+                            <div class="card-body p-4 d-flex align-items-center gap-4">
+                                <span class="qd-stat-icon lg orange"><i class="bi bi-star"></i></span>
+                                <div>
+                                    <div class="qd-stat-number">@Model.ReviewsGiven</div>
+                                    <div class="fw-semibold text-muted">Reviews given</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4 mb-5">
+
+                    <!-- ===== Your next table ===== -->
+                    <div class="col-xl-7">
+                        <div class="card qd-card h-100">
+                            <div class="card-body p-4 p-lg-5">
+
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="fw-bold mb-0">Your next table</h3>
+                                    @if (Model.NextReservation != null)
+                                    {
+                                        <span class="badge fs-6 px-3 py-2 @DashboardModel.StatusBadge(Model.NextReservation.Status)">
+                                            @Model.NextReservation.Status
+                                        </span>
+                                    }
+                                </div>
+
+                                @if (Model.NextReservation == null)
+                                {
+                                    <div class="text-center text-muted py-5">
+                                        <i class="bi bi-calendar-plus display-4 text-primary"></i>
+                                        <p class="fs-5 mt-3 mb-4">No upcoming reservations. Your table is waiting!</p>
+                                        <a asp-page="/Customer/ReserveTable" class="btn btn-qd px-5">Book a table</a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    var next = Model.NextReservation;
+                                    var daysAway = (next.ReservationDate.Date - DateTime.Today).Days;
+
+                                    <div class="d-flex flex-wrap gap-4 align-items-stretch">
+
+                                        <!-- Big date block -->
+                                        <div class="qd-date-block lg">
+                                            <small>@next.ReservationDate.ToString("MMM").ToUpper()</small>
+                                            <strong>@next.ReservationDate.Day</strong>
+                                            <small>@next.ReservationDate.ToString("dddd")</small>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <span class="qd-countdown mb-3">
+                                                <i class="bi bi-hourglass-split"></i>
+                                                @(daysAway == 0 ? "TODAY" : daysAway == 1 ? "TOMORROW" : $"IN {daysAway} DAYS")
+                                            </span>
+
+                                            <!-- Info tiles -->
+                                            <div class="row g-3 mt-1">
+                                                <div class="col-sm-4">
+                                                    <div class="qd-info-tile">
+                                                        <i class="bi bi-clock"></i>
+                                                        <small>Time</small>
+                                                        <strong>@DateTime.Today.Add(next.ReservationTime).ToString("h:mm tt")</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="qd-info-tile">
+                                                        <i class="bi bi-people"></i>
+                                                        <small>Guests</small>
+                                                        <strong>@next.NumberOfGuests people</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="qd-info-tile">
+                                                        <i class="bi bi-grid-3x3-gap"></i>
+                                                        <small>Table</small>
+                                                        <strong>T@(next.RestaurantTableId.ToString("00"))</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dining preferences (US06) -->
+                                    @if (!string.IsNullOrEmpty(next.SeatingPreference) ||
+                                         !string.IsNullOrEmpty(next.Occasion) ||
+                                         !string.IsNullOrEmpty(next.DietaryRequirements))
+                                    {
+                                        <h6 class="fw-bold mt-4 mb-2">Your preferences</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @if (!string.IsNullOrEmpty(next.SeatingPreference))
+                                            {
+                                                <span class="badge rounded-pill text-bg-light border fs-6 fw-normal px-3 py-2"><i class="bi bi-geo-alt"></i> @next.SeatingPreference</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(next.Occasion))
+                                            {
+                                                <span class="badge rounded-pill text-bg-light border fs-6 fw-normal px-3 py-2"><i class="bi bi-gift"></i> @next.Occasion</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(next.DietaryRequirements))
+                                            {
+                                                <span class="badge rounded-pill qd-pill-orange fs-6 fw-normal px-3 py-2"><i class="bi bi-exclamation-circle"></i> @next.DietaryRequirements</span>
+                                            }
+                                        </div>
+                                    }
+
+                                    <a asp-page="/Customer/MyReservation" class="btn btn-outline-primary mt-4 px-4">
+                                        View all reservations <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- ===== Right column ===== -->
+                    <div class="col-xl-5 d-flex flex-column gap-4">
+
+                        <!-- Review prompt (US12) -->
+                        @if (Model.ToReview != null)
+                        {
+                            <div class="qd-review-prompt">
+                                <div class="d-flex gap-4 align-items-center">
+                                    <span class="qd-stat-icon lg orange"><i class="bi bi-star-fill"></i></span>
+                                    <div>
+                                        <h5 class="fw-bold mb-1">How was your visit?</h5>
+                                        <p class="text-muted mb-3">
+                                            You dined with us on @Model.ToReview.ReservationDate.ToString("d MMM").
+                                            Tell us how it went!
+                                        </p>
+                                        <a asp-page="/Customer/Review" asp-route-id="@Model.ToReview.ReservationId"
+                                           class="btn btn-qd px-4">Leave a review</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Recent activity -->
+                        <div class="card qd-card flex-grow-1">
+                            <div class="card-body p-4 p-lg-5">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="fw-bold mb-0">Recent activity</h4>
+                                    <a asp-page="/Customer/MyReservation" class="fw-bold text-decoration-none">View all</a>
+                                </div>
+
+                                @if (Model.Recent.Count == 0)
+                                {
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox fs-1"></i>
+                                        <p class="mt-2 mb-0">Nothing yet. Your bookings will show up here.</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var r in Model.Recent)
+                                    {
+                                        <div class="d-flex align-items-center gap-3 py-3 border-bottom">
+
+                                            <!-- Mini date -->
+                                            <div class="qd-date-block sm">
+                                                <small>@r.ReservationDate.ToString("MMM").ToUpper()</small>
+                                                <strong>@r.ReservationDate.Day</strong>
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">@r.ReservationDate.ToString("dddd")</div>
+                                                <div class="text-muted">
+                                                    @DateTime.Today.Add(r.ReservationTime).ToString("h:mm tt") ·
+                                                    @r.NumberOfGuests guests · T@(r.RestaurantTableId.ToString("00"))
+                                                </div>
+                                            </div>
+
+                                            <span class="badge px-3 py-2 @DashboardModel.StatusBadge(r.Status)">@r.Status</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ===== Quick actions ===== -->
+                <h4 class="fw-bold mb-4">Quick actions</h4>
                 <div class="row g-4">
 
-                    <div class="col-md-6 col-xl-3">
-                        <a asp-page="/Customer/ReserveTable" class="card qd-card h-100 text-decoration-none text-dark">
-                            <div class="card-body">
-                                <i class="bi bi-calendar-check fs-2 text-primary"></i>
-                                <h5 class="fw-bold mt-2">Book a table</h5>
-                                <p class="text-muted small mb-0">Pick your date, time and table.</p>
+                    <div class="col-6 col-xl-3">
+                        <a asp-page="/Customer/ReserveTable" class="card qd-card qd-hover-lift h-100 text-decoration-none text-dark">
+                            <div class="card-body p-4">
+                                <span class="qd-stat-icon lg"><i class="bi bi-calendar-check"></i></span>
+                                <h5 class="fw-bold mt-3 mb-1">Book a table</h5>
+                                <p class="text-muted mb-0">Pick your date, time and table.</p>
                             </div>
                         </a>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <a asp-page="/Customer/Menu" class="card qd-card h-100 text-decoration-none text-dark">
-                            <div class="card-body">
-                                <i class="bi bi-journal-text fs-2 text-primary"></i>
-                                <h5 class="fw-bold mt-2">Browse menu</h5>
-                                <p class="text-muted small mb-0">See dishes and order ahead.</p>
+                    <div class="col-6 col-xl-3">
+                        <a asp-page="/Customer/Menu" class="card qd-card qd-hover-lift h-100 text-decoration-none text-dark">
+                            <div class="card-body p-4">
+                                <span class="qd-stat-icon lg orange"><i class="bi bi-journal-text"></i></span>
+                                <h5 class="fw-bold mt-3 mb-1">Browse menu</h5>
+                                <p class="text-muted mb-0">See dishes and order ahead.</p>
                             </div>
                         </a>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <a asp-page="/Customer/MyReservation" class="card qd-card h-100 text-decoration-none text-dark">
-                            <div class="card-body">
-                                <i class="bi bi-clock-history fs-2 text-primary"></i>
-                                <h5 class="fw-bold mt-2">My history</h5>
-                                <p class="text-muted small mb-0">Past reservations and orders.</p>
+                    <div class="col-6 col-xl-3">
+                        <a asp-page="/Customer/MyReservation" class="card qd-card qd-hover-lift h-100 text-decoration-none text-dark">
+                            <div class="card-body p-4">
+                                <span class="qd-stat-icon lg green"><i class="bi bi-clock-history"></i></span>
+                                <h5 class="fw-bold mt-3 mb-1">My history</h5>
+                                <p class="text-muted mb-0">Past reservations and orders.</p>
                             </div>
                         </a>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <a asp-page="/Customer/Profile" class="card qd-card h-100 text-decoration-none text-dark">
-                            <div class="card-body">
-                                <i class="bi bi-person-gear fs-2 text-primary"></i>
-                                <h5 class="fw-bold mt-2">My profile</h5>
-                                <p class="text-muted small mb-0">Update details and preferences.</p>
+                    <div class="col-6 col-xl-3">
+                        <a asp-page="/Customer/Profile" class="card qd-card qd-hover-lift h-100 text-decoration-none text-dark">
+                            <div class="card-body p-4">
+                                <span class="qd-stat-icon lg purple"><i class="bi bi-person-gear"></i></span>
+                                <h5 class="fw-bold mt-3 mb-1">My profile</h5>
+                                <p class="text-muted mb-0">Update details and preferences.</p>
                             </div>
                         </a>
                     </div>

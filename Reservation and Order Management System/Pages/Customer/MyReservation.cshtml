@@ -1,6 +1,5 @@
 ﻿@page
 @model Reservation_and_Order_Management_System.Pages.Customer.MyReservationModel
-@using Reservation_and_Order_Management_System.Pages.Customer
 
 @{
     Layout = null;
@@ -28,13 +27,14 @@
                 <i class="bi bi-fork-knife"></i> QDine
             </a>
 
+            <a class="qd-nav-link" asp-page="/Customer/Dashboard"><i class="bi bi-house"></i> Home</a>
             <a class="qd-nav-link" asp-page="/Customer/Menu"><i class="bi bi-grid"></i> Menu</a>
             <a class="qd-nav-link" asp-page="/Customer/ReserveTable"><i class="bi bi-book"></i> Reservation</a>
             <a class="qd-nav-link" asp-page="/Customer/Cart"><i class="bi bi-cart"></i> Cart</a>
             <a class="qd-nav-link active" asp-page="/Customer/MyReservation"><i class="bi bi-clock-history"></i> Order History</a>
 
             <div class="mt-auto">
-                <a class="qd-nav-link" asp-page="/Customer/Profile"><i class="bi bi-gear"></i> Settings</a>
+                <a class="qd-nav-link" asp-page="/Customer/Profile"><i class="bi bi-gear"></i> Profile &amp; Settings</a>
                 <a class="qd-nav-link text-danger" asp-page="/Customer/Logout"><i class="bi bi-box-arrow-left"></i> Log out</a>
             </div>
         </nav>
@@ -171,6 +171,7 @@
                                             <th>Guests</th>
                                             <th>Preferences</th>
                                             <th>Status</th>
+                                            <th>Review</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -190,6 +191,28 @@
                                                 </td>
                                                 <td>
                                                     <span class="badge @MyReservationModel.StatusBadge(r.Status)">@r.Status</span>
+                                                </td>
+
+                                                <!-- US12: review stars or button -->
+                                                <td>
+                                                    @if (Model.Ratings.ContainsKey(r.ReservationId))
+                                                    {
+                                                        int stars = Model.Ratings[r.ReservationId];
+                                                        <span class="text-qd-orange" title="@stars out of 5">
+                                                            @(new string('★', stars))@(new string('☆', 5 - stars))
+                                                        </span>
+                                                    }
+                                                    else if (r.Status != "Cancelled")
+                                                    {
+                                                        <a asp-page="/Customer/Review" asp-route-id="@r.ReservationId"
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-star"></i> Leave review
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
