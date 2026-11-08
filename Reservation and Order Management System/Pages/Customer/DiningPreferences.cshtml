@@ -1,0 +1,59 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Customer.DiningPreferencesModel
+@{
+    ViewData["Title"] = "Dining Preferences";
+}
+
+<h1>Dining preferences</h1>
+<p>Tell us what would make your visit more comfortable. All fields are optional.</p>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-success" role="status">@Model.Message</div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <fieldset class="mb-3">
+        <legend>Dietary preferences</legend>
+
+        <div class="form-check">
+            <input asp-for="Input.Vegetarian" class="form-check-input" />
+            <label asp-for="Input.Vegetarian" class="form-check-label"></label>
+        </div>
+        <div class="form-check">
+            <input asp-for="Input.Vegan" class="form-check-input" />
+            <label asp-for="Input.Vegan" class="form-check-label"></label>
+        </div>
+        <div class="form-check">
+            <input asp-for="Input.Halal" class="form-check-input" />
+            <label asp-for="Input.Halal" class="form-check-label"></label>
+        </div>
+        <div class="form-check">
+            <input asp-for="Input.GlutenFree" class="form-check-input" />
+            <label asp-for="Input.GlutenFree" class="form-check-label"></label>
+        </div>
+    </fieldset>
+
+    <div class="mb-3">
+        <label asp-for="Input.Allergies" class="form-label"></label>
+        <textarea asp-for="Input.Allergies" class="form-control" rows="3"
+                  placeholder="List any food allergies"></textarea>
+        <span asp-validation-for="Input.Allergies" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.SpecialRequests" class="form-label"></label>
+        <textarea asp-for="Input.SpecialRequests" class="form-control" rows="4"
+                  placeholder="For example: wheelchair access or a high chair"></textarea>
+        <span asp-validation-for="Input.SpecialRequests" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save preferences</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

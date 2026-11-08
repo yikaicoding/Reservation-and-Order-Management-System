@@ -1,0 +1,184 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Reservations.CreateModel
+@{
+    ViewData["Title"] = "Reserve a table";
+    ViewData["BodyClass"] = "booking-page";
+}
+
+<div class="booking-app">
+    <aside class="booking-sidebar">
+        <a class="booking-brand" asp-page="/Index" aria-label="Dine home">
+            <span class="booking-brand-mark">Q</span><span>Dine</span>
+        </a>
+
+        <div class="booking-sidebar-label">YOUR EXPERIENCE</div>
+
+        <nav class="booking-nav" aria-label="Main navigation">
+            <a asp-page="/Index"><span class="booking-nav-icon">▦</span>Menu</a>
+            <a class="active" asp-page="/Reservations/Create"><span class="booking-nav-icon">▣</span>Reservation</a>
+            <a asp-page="/Orders/Create"><span class="booking-nav-icon">▤</span>Order food</a>
+            <a asp-page="/Profile"><span class="booking-nav-icon">♙</span>Dining preferences</a>
+        </nav>
+
+        <div class="booking-sidebar-bottom">
+            <span class="booking-status-dot"></span>
+            <span>
+                <strong>Table service</strong>
+                <small>We’re ready for you</small>
+            </span>
+        </div>
+    </aside>
+
+    <main class="booking-main">
+        <section class="booking-hero">
+            <div class="booking-orb booking-orb-one"></div>
+            <div class="booking-orb booking-orb-two"></div>
+
+            <div class="booking-hero-content">
+                <div class="booking-progress" aria-label="Reservation steps">
+                    <div class="booking-step current"><span>1</span><small>Your details</small></div>
+                    <i></i>
+                    <div class="booking-step"><span>2</span><small>Choose a table</small></div>
+                    <i></i>
+                    <div class="booking-step"><span>3</span><small>Preferences</small></div>
+                    <i></i>
+                    <div class="booking-step"><span>4</span><small>Confirmation</small></div>
+                </div>
+
+                <div class="booking-title">
+                    <span class="booking-eyebrow"><span></span> A seat is waiting</span>
+                    <h1>Skip the queue, just dine.</h1>
+                    <p>Pick your time, find your table, and make it a meal to remember.</p>
+                </div>
+
+                <form method="post" class="booking-form">
+                    <div asp-validation-summary="All" class="booking-validation"></div>
+
+                    <div class="booking-field">
+                        <label asp-for="Input.StartsAt">Date &amp; time</label>
+                        <input asp-for="Input.StartsAt" type="datetime-local" step="60" />
+                    </div>
+
+                    <div class="booking-field">
+                        <label asp-for="Input.PartySize">Guests</label>
+                        <select asp-for="Input.PartySize">
+                            @for (var guests = 1; guests <= 12; guests++)
+                            {
+                                <option value="@guests">
+                                    @guests @(guests == 1 ? "guest" : "guests")
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="booking-field">
+                        <label asp-for="Input.RestaurantTableId">Available table</label>
+                        <select asp-for="Input.RestaurantTableId">
+                            <option value="">Choose a table</option>
+                            @foreach (var table in Model.Tables)
+                            {
+                                <option value="@table.RestaurantTableId">
+                                    @table.TableName · up to @table.Capacity
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="booking-submit">
+                        Find availability <span>→</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <div class="booking-content">
+            <section class="booking-section" aria-labelledby="dining-highlights-title">
+                <div class="booking-section-heading">
+                    <div>
+                        <span class="section-kicker">THE SPACE</span>
+                        <h2 id="dining-highlights-title">Dining area highlights</h2>
+                    </div>
+                    <span class="section-caption">Find your kind of atmosphere</span>
+                </div>
+
+                <div class="dining-highlights">
+                    <article class="dining-feature dining-feature-main">
+                        <div class="dining-art dining-art-main">
+                            <span class="art-sun"></span>
+                            <span class="art-window"></span>
+                            <span class="art-table"></span>
+                        </div>
+                        <div class="highlight-caption">
+                            <span>01 / SIGNATURE SPACE</span>
+                            <h3>The dining room</h3>
+                            <p>Warm lights, good company, and a table set just for you.</p>
+                        </div>
+                    </article>
+
+                    <article class="dining-feature">
+                        <div class="dining-art dining-art-lounge">
+                            <span class="art-lounge-lamp"></span>
+                            <span class="art-lounge-seat"></span>
+                        </div>
+                        <div class="highlight-caption">
+                            <span>02 / SLOW EVENINGS</span>
+                            <h3>The lounge</h3>
+                        </div>
+                    </article>
+
+                    <article class="dining-feature">
+                        <div class="dining-art dining-art-patio">
+                            <span class="art-leaf leaf-one"></span>
+                            <span class="art-leaf leaf-two"></span>
+                            <span class="art-patio-table"></span>
+                        </div>
+                        <div class="highlight-caption">
+                            <span>03 / OPEN AIR</span>
+                            <h3>Garden tables</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="booking-section" aria-labelledby="top-dishes-title">
+                <div class="booking-section-heading">
+                    <div>
+                        <span class="section-kicker">FROM OUR KITCHEN</span>
+                        <h2 id="top-dishes-title">Top dishes</h2>
+                    </div>
+                    <span class="section-caption">A little something to look forward to</span>
+                </div>
+
+                <div class="dish-grid">
+                    <article class="dish-card">
+                        <div class="dish-art dish-art-seafood"><span>✦</span></div>
+                        <div class="dish-copy">
+                            <div><h3>Coastal catch</h3><p>Fresh from the sea</p></div>
+                            <span class="dish-number">01</span>
+                        </div>
+                    </article>
+
+                    <article class="dish-card">
+                        <div class="dish-art dish-art-steak"><span>✦</span></div>
+                        <div class="dish-copy">
+                            <div><h3>House cut</h3><p>Chargrilled, simply done</p></div>
+                            <span class="dish-number">02</span>
+                        </div>
+                    </article>
+
+                    <article class="dish-card">
+                        <div class="dish-art dish-art-dessert"><span>✦</span></div>
+                        <div class="dish-copy">
+                            <div><h3>Sweet ending</h3><p>Made for sharing</p></div>
+                            <span class="dish-number">03</span>
+                        </div>
+                    </article>
+                </div>
+
+                <p class="content-note">
+                    Dining area and dish highlights are sample content. Replace them with your restaurant’s photos and menu items.
+                </p>
+            </section>
+        </div>
+    </main>
+</div>
