@@ -21,7 +21,8 @@
     var isProfilePage = bodyClass == "profile-page";
     var isBookingPage = bodyClass == "booking-page";
     var isOrderPage = ViewData["BodyClass"]?.ToString() == "order-page";
-    var isStandalonePage = isProfilePage || isBookingPage || isOrderPage;
+    var isStaffPage = ViewData["BodyClass"]?.ToString() == "staff-page";
+    var isStandalonePage = isProfilePage || isBookingPage || isOrderPage || isStaffPage;
 }
 
 <body class="@bodyClass">
@@ -117,3 +118,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+

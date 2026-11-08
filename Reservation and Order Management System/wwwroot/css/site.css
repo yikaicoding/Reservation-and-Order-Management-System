@@ -85,6 +85,29 @@ body.profile-page {
     display: grid;
     gap: 5px;
 }
+.reservation-nav-group {
+    display: grid;
+    gap: 4px;
+}
+
+.profile-nav a.staff-portal-subitem {
+    min-height: 34px;
+    margin-left: 14px;
+    padding-left: 10px;
+    border-left: 2px solid #dce8fa;
+    border-radius: 0 8px 8px 0;
+    color: #71809a;
+    font-size: 10px;
+}
+
+.profile-nav a.staff-portal-subitem .nav-icon {
+    font-size: 13px;
+}
+
+.profile-nav a.staff-portal-subitem:hover {
+    background: #f2f6fd;
+    color: #1255ce;
+}
 
     .profile-nav a,
     .sidebar-logout button {
@@ -896,3 +919,4 @@ body.profile-page {
         min-height: 32px;
     }
 }
+

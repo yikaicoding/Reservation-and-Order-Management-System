@@ -64,7 +64,7 @@
             <div class="profile-heading-row">
                 <div>
                     <h2>Build your order</h2>
-                    <p>Submit up to three items for one of your upcoming confirmed reservations.</p>
+                    <p>Start with two items and add as many more as you need.</p>
                 </div>
                 <div class="secure-label"><span>✓</span> SECURE ORDER</div>
             </div>
@@ -107,37 +107,24 @@
                         <div class="order-items-heading">
                             <div>
                                 <h3>What would you like?</h3>
-                                <p>Add up to three food items.</p>
+                                <p>Start with two items. Add more whenever you need.</p>
                             </div>
-                            <span class="order-count">UP TO 3 ITEMS</span>
+                            <button class="order-add" type="button" id="add-order-item" aria-label="Add another food item" title="Add another food item"><span aria-hidden="true">+</span><span>Add item</span></button>
                         </div>
 
-                        @for (var i = 0; i < 3; i++)
+                        <div id="order-lines">
+                        @for (var i = 0; i < (Model.Lines?.Count ?? 0); i++)
                         {
-                            var line = Model.Lines != null && Model.Lines.Count > i
-                                ? Model.Lines[i]
-                                : null;
-
+                            var line = Model.Lines != null && Model.Lines.Count > i ? Model.Lines[i] : null;
                             <div class="order-line">
                                 <label class="order-label" for="Lines_@(i)__ItemName">Item @(i + 1)</label>
-                                <input id="Lines_@(i)__ItemName"
-                                       name="Lines[@i].ItemName"
-                                       value="@line?.ItemName"
-                                       class="form-control order-input"
-                                       maxlength="100"
-                                       placeholder="e.g. Grilled chicken salad" />
-
+                                <input id="Lines_@(i)__ItemName" name="Lines[@i].ItemName" value="@line?.ItemName" class="form-control order-input" maxlength="100" placeholder="e.g. Grilled chicken salad" />
                                 <label class="order-label quantity-label" for="Lines_@(i)__Quantity">Qty</label>
-                                <input id="Lines_@(i)__Quantity"
-                                       name="Lines[@i].Quantity"
-                                       type="number"
-                                       min="1"
-                                       max="50"
-                                       value="@(line?.Quantity ?? 1)"
-                                       class="form-control order-input quantity-input" />
+                                <input id="Lines_@(i)__Quantity" name="Lines[@i].Quantity" type="number" min="1" max="50" value="@(line?.Quantity ?? 1)" class="form-control order-input quantity-input" />
+                                <button class="order-remove" type="button" aria-label="Remove item @(i + 1)" title="Remove item"><span aria-hidden="true">&#215;</span></button>
                             </div>
                         }
-
+                        </div>
                         <button class="btn order-submit"
                                 type="submit"
                                 disabled="@(Model.Reservations.Count == 0)">
@@ -280,6 +267,36 @@
             font-size: 9px;
         }
 
+        .order-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 11px 6px 7px;
+            border: 1px solid #d9e7ff;
+            border-radius: 20px;
+            background: #edf4ff;
+            color: #2469d2;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .order-add > span:first-child {
+            display: inline-grid;
+            width: 20px;
+            height: 20px;
+            place-items: center;
+            border-radius: 50%;
+            background: #1768e8;
+            color: #fff;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .order-add:hover {
+            background: #e2edff;
+        }
+
         .order-count {
             padding: 5px 8px;
             border-radius: 20px;
@@ -293,11 +310,32 @@
 
         .order-line {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 74px;
+            grid-template-columns: minmax(0, 1fr) 74px 34px;
             align-items: end;
             gap: 6px 11px;
             margin-bottom: 13px;
         }
+
+        .order-remove {
+            display: grid;
+            width: 32px;
+            height: 38px;
+            grid-column: 3;
+            grid-row: 2;
+            place-items: center;
+            border: 1px solid #f0d4d2;
+            border-radius: 8px;
+            background: #fffafa;
+            color: #b84640;
+            cursor: pointer;
+        }
+
+        .order-remove:hover {
+            border-color: #e8b7b4;
+            background: #fff0ef;
+        }
+
+        .order-remove span { font-size: 21px; line-height: 1; }
 
         .order-line .order-label:first-child {
             grid-column: 1;
@@ -413,9 +451,64 @@
             }
 
             .order-line {
-                grid-template-columns: minmax(0, 1fr) 64px;
+                grid-template-columns: minmax(0, 1fr) 58px 30px;
                 gap: 6px 8px;
             }
         }
     </style>
 }
+@section Scripts {
+    <script>
+        (() => {
+            const container = document.getElementById("order-lines");
+            const addButton = document.getElementById("add-order-item");
+            if (!container || !addButton) return;
+
+            const renumberRows = () => {
+                container.querySelectorAll(".order-line").forEach((row, index) => {
+                    const name = row.querySelector(".item-name");
+                    const quantity = row.querySelector(".quantity-input");
+                    const itemLabel = row.querySelector(".item-label");
+                    const quantityLabel = row.querySelector(".quantity-label");
+                    const remove = row.querySelector(".order-remove");
+                    name.id = `Lines_${index}__ItemName`;
+                    name.name = `Lines[${index}].ItemName`;
+                    quantity.id = `Lines_${index}__Quantity`;
+                    quantity.name = `Lines[${index}].Quantity`;
+                    itemLabel.htmlFor = name.id;
+                    itemLabel.textContent = `Item ${index + 1}`;
+                    quantityLabel.htmlFor = quantity.id;
+                    remove.setAttribute("aria-label", `Remove item ${index + 1}`);
+                });
+            };
+
+            addButton.addEventListener("click", () => {
+                const index = container.querySelectorAll(".order-line").length;
+                const row = document.createElement("div");
+                row.className = "order-line";
+                row.innerHTML = `
+                    <label class="order-label item-label" for="Lines_${index}__ItemName">Item ${index + 1}</label>
+                    <input id="Lines_${index}__ItemName" name="Lines[${index}].ItemName" class="form-control order-input item-name" maxlength="100" placeholder="e.g. Grilled chicken salad" />
+                    <label class="order-label quantity-label" for="Lines_${index}__Quantity">Qty</label>
+                    <input id="Lines_${index}__Quantity" name="Lines[${index}].Quantity" type="number" min="1" max="50" value="1" class="form-control order-input quantity-input" />
+                    <button class="order-remove" type="button" aria-label="Remove item ${index + 1}" title="Remove item"><span aria-hidden="true">×</span></button>`;
+                container.appendChild(row);
+                row.querySelector(".item-name").focus();
+            });
+
+            container.addEventListener("click", event => {
+                const remove = event.target.closest(".order-remove");
+                if (!remove) return;
+                remove.closest(".order-line").remove();
+                renumberRows();
+            });
+
+            container.querySelectorAll(".order-line").forEach(row => {
+                row.querySelector("input[name$='.ItemName']")?.classList.add("item-name");
+                row.querySelector("label[for$='__ItemName']")?.classList.add("item-label");
+            });
+        })();
+    </script>
+}
+
+

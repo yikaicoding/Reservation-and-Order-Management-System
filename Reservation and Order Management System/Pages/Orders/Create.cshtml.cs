@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -12,13 +12,11 @@ namespace Reservation_and_Order_Management_System.Pages.Orders;
 [Authorize]
 public class CreateModel(ApplicationDbContext db) : PageModel
 {
-    private const int MaximumOrderLines = 3;
-
     [BindProperty, Range(1, int.MaxValue)]
     public int ReservationId { get; set; }
 
     [BindProperty]
-    public List<OrderLineInput> Lines { get; set; } = [new(), new(), new()];
+    public List<OrderLineInput> Lines { get; set; } = [new(), new()];
 
     public List<Reservation> Reservations { get; set; } = [];
 
@@ -26,6 +24,7 @@ public class CreateModel(ApplicationDbContext db) : PageModel
 
     public async Task OnGetAsync()
     {
+        Lines = [new(), new()];
         await LoadReservationsAsync();
     }
 
@@ -61,13 +60,6 @@ public class CreateModel(ApplicationDbContext db) : PageModel
         }
 
         Lines ??= [];
-
-        if (Lines.Count > MaximumOrderLines)
-        {
-            ModelState.AddModelError(
-                nameof(Lines),
-                $"An order can contain at most {MaximumOrderLines} items.");
-        }
 
         var items = Lines
             .Where(line => line is not null &&
@@ -133,3 +125,5 @@ public class CreateModel(ApplicationDbContext db) : PageModel
         public int Quantity { get; set; } = 1;
     }
 }
+
+

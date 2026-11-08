@@ -20,9 +20,17 @@
 
         <nav class="profile-nav">
             <a asp-page="/Index"><span class="nav-icon">&#8962;</span><span>Home</span></a>
-            <a class="active" asp-page="/Reservations/Create" aria-current="page">
-                <span class="nav-icon">&#9638;</span><span>Reservations</span>
-            </a>
+            <div class="reservation-nav-group">
+                <a class="active" asp-page="/Reservations/Create" aria-current="page">
+                    <span class="nav-icon">&#9638;</span><span>Reservations</span>
+                </a>
+                @if (User.IsInRole("Staff") || User.IsInRole("Admin"))
+                {
+                    <a class="staff-portal-subitem" asp-page="/Staff/Reservations">
+                        <span class="nav-icon">&#8627;</span><span>Staff reservation portal</span>
+                    </a>
+                }
+            </div>
             <a asp-page="/Orders/Create"><span class="nav-icon">&#9827;</span><span>Order food</span></a>
             <a asp-page="/Profile"><span class="nav-icon">&#9881;</span><span>Profile &amp; Settings</span></a>
         </nav>

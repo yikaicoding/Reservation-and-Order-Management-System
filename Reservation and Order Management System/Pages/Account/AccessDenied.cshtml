@@ -1,0 +1,18 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Account.AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+<div class="container py-5">
+    <div class="mx-auto text-center" style="max-width: 560px">
+        <div class="display-1 text-warning" aria-hidden="true">&#9940;</div>
+        <h1 class="h2 mt-3">Staff access required</h1>
+        <p class="text-secondary">Your account does not have permission to open the staff reservation portal. Sign in with a Staff or Admin account, or return to the home page.</p>
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <a class="btn btn-primary" asp-page="/Index">Go to home</a>
+            <form method="post" asp-page="/Account/Logout">
+                <button class="btn btn-outline-secondary" type="submit">Sign in with another account</button>
+            </form>
+        </div>
+    </div>
+</div>
