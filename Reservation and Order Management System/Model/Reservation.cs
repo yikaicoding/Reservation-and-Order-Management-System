@@ -27,4 +27,6 @@ public class Reservation
 
     [Required, StringLength(20)]
     public string Status { get; set; } = "Pending";
+
+    public FoodOrder? FoodOrder { get; set; }
 }

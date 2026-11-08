@@ -3,30 +3,43 @@
 @{
     ViewData["Title"] = "Reserve a table";
     ViewData["BodyClass"] = "booking-page";
+    var email = User.Identity?.Name ?? "Signed-in account";
+    var avatarLetter = string.IsNullOrWhiteSpace(email)
+        ? "G"
+        : email[..1].ToUpperInvariant();
 }
 
 <div class="booking-app">
-    <aside class="booking-sidebar">
-        <a class="booking-brand" asp-page="/Index" aria-label="Dine home">
-            <span class="booking-brand-mark">Q</span><span>Dine</span>
+    <aside class="profile-sidebar" aria-label="Main navigation">
+        <a class="profile-brand" asp-page="/Index" aria-label="Q Dine home">
+            <span class="brand-mark">Q</span>
+            <span>Q<span class="brand-light">Dine</span></span>
         </a>
 
-        <div class="booking-sidebar-label">YOUR EXPERIENCE</div>
+        <div class="sidebar-label">YOUR ACCOUNT</div>
 
-        <nav class="booking-nav" aria-label="Main navigation">
-            <a asp-page="/Index"><span class="booking-nav-icon">▦</span>Menu</a>
-            <a class="active" asp-page="/Reservations/Create"><span class="booking-nav-icon">▣</span>Reservation</a>
-            <a asp-page="/Orders/Create"><span class="booking-nav-icon">▤</span>Order food</a>
-            <a asp-page="/Profile"><span class="booking-nav-icon">♙</span>Dining preferences</a>
+        <nav class="profile-nav">
+            <a asp-page="/Index"><span class="nav-icon">&#8962;</span><span>Home</span></a>
+            <a class="active" asp-page="/Reservations/Create" aria-current="page">
+                <span class="nav-icon">&#9638;</span><span>Reservations</span>
+            </a>
+            <a asp-page="/Orders/Create"><span class="nav-icon">&#9827;</span><span>Order food</span></a>
+            <a asp-page="/Profile"><span class="nav-icon">&#9881;</span><span>Profile &amp; Settings</span></a>
         </nav>
 
-        <div class="booking-sidebar-bottom">
-            <span class="booking-status-dot"></span>
-            <span>
-                <strong>Table service</strong>
-                <small>We’re ready for you</small>
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-user">
+            <span class="user-avatar">@avatarLetter</span>
+            <span class="sidebar-user-copy">
+                <strong>@email</strong>
+                <small>Customer account</small>
             </span>
         </div>
+
+        <form method="post" asp-page="/Account/Logout" class="sidebar-logout">
+            <button type="submit"><span class="nav-icon">&#8618;</span>Log out</button>
+        </form>
     </aside>
 
     <main class="booking-main">
@@ -59,7 +72,7 @@
                         <input asp-for="Input.StartsAt" type="datetime-local" step="60" />
                     </div>
 
-                    <div class="booking-field">
+                    <div class="booking-field party-field">
                         <label asp-for="Input.PartySize">Guests</label>
                         <select asp-for="Input.PartySize">
                             @for (var guests = 1; guests <= 12; guests++)
@@ -71,14 +84,14 @@
                         </select>
                     </div>
 
-                    <div class="booking-field">
+                    <div class="booking-field table-field">
                         <label asp-for="Input.RestaurantTableId">Available table</label>
                         <select asp-for="Input.RestaurantTableId">
                             <option value="">Choose a table</option>
                             @foreach (var table in Model.Tables)
                             {
                                 <option value="@table.RestaurantTableId">
-                                    @table.TableName · up to @table.Capacity
+                                    Table #@table.RestaurantTableId · up to @table.Capacity
                                 </option>
                             }
                         </select>
@@ -92,93 +105,748 @@
         </section>
 
         <div class="booking-content">
-            <section class="booking-section" aria-labelledby="dining-highlights-title">
+            @if (TempData["Message"] is string message)
+            {
+                <div class="booking-success" role="status">
+                    <span>✓</span>@message
+                </div>
+            }
+
+            <section class="booking-section gallery-section"
+                     aria-labelledby="restaurant-gallery-title">
                 <div class="booking-section-heading">
                     <div>
-                        <span class="section-kicker">THE SPACE</span>
-                        <h2 id="dining-highlights-title">Dining area highlights</h2>
+                        <span class="section-kicker">YOUR RESTAURANT</span>
+                        <h2 id="restaurant-gallery-title">Restaurant gallery</h2>
                     </div>
-                    <span class="section-caption">Find your kind of atmosphere</span>
+                    <span class="section-caption">Photos from our dining space and menu</span>
                 </div>
 
-                <div class="dining-highlights">
-                    <article class="dining-feature dining-feature-main">
-                        <div class="dining-art dining-art-main">
-                            <span class="art-sun"></span>
-                            <span class="art-window"></span>
-                            <span class="art-table"></span>
-                        </div>
-                        <div class="highlight-caption">
-                            <span>01 / SIGNATURE SPACE</span>
-                            <h3>The dining room</h3>
-                            <p>Warm lights, good company, and a table set just for you.</p>
-                        </div>
-                    </article>
-
-                    <article class="dining-feature">
-                        <div class="dining-art dining-art-lounge">
-                            <span class="art-lounge-lamp"></span>
-                            <span class="art-lounge-seat"></span>
-                        </div>
-                        <div class="highlight-caption">
-                            <span>02 / SLOW EVENINGS</span>
-                            <h3>The lounge</h3>
-                        </div>
-                    </article>
-
-                    <article class="dining-feature">
-                        <div class="dining-art dining-art-patio">
-                            <span class="art-leaf leaf-one"></span>
-                            <span class="art-leaf leaf-two"></span>
-                            <span class="art-patio-table"></span>
-                        </div>
-                        <div class="highlight-caption">
-                            <span>03 / OPEN AIR</span>
-                            <h3>Garden tables</h3>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-            <section class="booking-section" aria-labelledby="top-dishes-title">
-                <div class="booking-section-heading">
-                    <div>
-                        <span class="section-kicker">FROM OUR KITCHEN</span>
-                        <h2 id="top-dishes-title">Top dishes</h2>
+                @if (TempData["UploadMessage"] is string uploadMessage)
+                {
+                    <div class="booking-success" role="status">
+                        <span>✓</span>@uploadMessage
                     </div>
-                    <span class="section-caption">A little something to look forward to</span>
-                </div>
+                }
 
-                <div class="dish-grid">
-                    <article class="dish-card">
-                        <div class="dish-art dish-art-seafood"><span>✦</span></div>
-                        <div class="dish-copy">
-                            <div><h3>Coastal catch</h3><p>Fresh from the sea</p></div>
-                            <span class="dish-number">01</span>
+                @if (TempData["UploadError"] is string uploadError)
+                {
+                    <div class="gallery-error" role="alert">@uploadError</div>
+                }
+
+                @if (Model.CanManageGallery)
+                {
+                    <form method="post"
+                          enctype="multipart/form-data"
+                          asp-page-handler="UploadImage"
+                          class="gallery-upload">
+                        <label for="gallery-image">Upload a restaurant photo</label>
+
+                        <div class="gallery-upload-controls">
+                            <input id="gallery-image"
+                                   type="file"
+                                   name="image"
+                                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                   required />
+                            <button type="submit">Upload image</button>
                         </div>
-                    </article>
 
-                    <article class="dish-card">
-                        <div class="dish-art dish-art-steak"><span>✦</span></div>
-                        <div class="dish-copy">
-                            <div><h3>House cut</h3><p>Chargrilled, simply done</p></div>
-                            <span class="dish-number">02</span>
-                        </div>
-                    </article>
+                        <small>JPG, PNG, or WebP · Maximum 5 MB</small>
+                    </form>
+                }
 
-                    <article class="dish-card">
-                        <div class="dish-art dish-art-dessert"><span>✦</span></div>
-                        <div class="dish-copy">
-                            <div><h3>Sweet ending</h3><p>Made for sharing</p></div>
-                            <span class="dish-number">03</span>
-                        </div>
-                    </article>
-                </div>
-
-                <p class="content-note">
-                    Dining area and dish highlights are sample content. Replace them with your restaurant’s photos and menu items.
-                </p>
+                @if (Model.GalleryImages.Count > 0)
+                {
+                    <div class="gallery-grid">
+                        @foreach (var imageUrl in Model.GalleryImages)
+                        {
+                            <figure class="gallery-item">
+                                <img src="@imageUrl"
+                                     alt="Restaurant gallery photo"
+                                     loading="lazy" />
+                            </figure>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="gallery-empty">
+                        <span class="gallery-empty-icon">▧</span>
+                        <h3>No restaurant photos yet</h3>
+                        <p>Staff can upload photos here to show guests the dining space and dishes.</p>
+                    </div>
+                }
             </section>
         </div>
     </main>
 </div>
+
+@section Styles {
+    <style>
+        body.booking-page {
+            --booking-ink: #18243a;
+            --booking-muted: #8994a6;
+            --booking-blue: #1056c8;
+            --booking-orange: #ff9d08;
+            margin: 0;
+            min-height: 100vh;
+            background: #f4f5f7;
+            color: var(--booking-ink);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+        }
+
+        .booking-page > .booking-app {
+            min-height: 100vh;
+        }
+
+        .booking-page .booking-app {
+            display: flex;
+        }
+
+        .booking-page .booking-sidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            width: 220px;
+            padding: 27px 16px 18px;
+            background: #fff;
+            border-right: 1px solid #e8ebf0;
+        }
+
+        .booking-page .booking-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 8px 47px;
+            color: #1158cb;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+        }
+
+        .booking-page .booking-brand-mark {
+            display: grid;
+            width: 28px;
+            height: 28px;
+            place-items: center;
+            border: 2px solid #1768df;
+            border-radius: 50%;
+            color: #f29a00;
+            font-family: Georgia, serif;
+            font-size: 19px;
+        }
+
+        .booking-page .booking-sidebar-label {
+            margin: 0 11px 12px;
+            color: #a3acba;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+        }
+
+        .booking-page .booking-nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        .booking-page .booking-nav a {
+            display: flex;
+            min-height: 43px;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            border-radius: 9px;
+            color: #566176;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 650;
+            transition: background .15s, color .15s;
+        }
+
+        .booking-page .booking-nav a:hover {
+            background: #f1f5fb;
+            color: #145acb;
+        }
+
+        .booking-page .booking-nav a.active {
+            background: linear-gradient(105deg, #1971f4, #084dbc);
+            color: #fff;
+            box-shadow: 0 6px 14px #1664dd2b;
+        }
+
+        .booking-page .booking-nav-icon {
+            display: inline-grid;
+            width: 18px;
+            place-items: center;
+            color: #94a0b2;
+            font-size: 16px;
+        }
+
+        .booking-page .booking-nav a.active .booking-nav-icon {
+            color: #fff;
+        }
+
+        .booking-page .booking-sidebar-bottom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+            padding: 13px 8px 0;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .booking-page .booking-status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #32bd7b;
+            box-shadow: 0 0 0 4px #e4f8ed;
+        }
+
+        .booking-page .booking-sidebar-bottom span:last-child {
+            display: grid;
+            gap: 3px;
+        }
+
+        .booking-page .booking-sidebar-bottom strong {
+            color: #3a475c;
+            font-size: 10px;
+        }
+
+        .booking-page .booking-sidebar-bottom small {
+            color: #99a3b2;
+            font-size: 9px;
+        }
+
+        .booking-page .booking-main {
+            width: calc(100% - 220px);
+            min-height: 100vh;
+            margin-left: 220px;
+        }
+
+        .booking-page .booking-hero {
+            position: relative;
+            min-height: 310px;
+            overflow: visible;
+            background: linear-gradient(112deg, #0847ad 0%, #105bcf 52%, #0b49b1 100%);
+            color: #fff;
+        }
+
+        .booking-page .booking-hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 27px clamp(24px, 4vw, 58px) 0;
+        }
+
+        .booking-page .booking-orb {
+            position: absolute;
+            border: 1px solid #ffffff12;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .booking-page .booking-orb-one {
+            top: -260px;
+            right: 16%;
+            width: 440px;
+            height: 440px;
+        }
+
+        .booking-page .booking-orb-two {
+            right: -140px;
+            bottom: -310px;
+            width: 500px;
+            height: 500px;
+        }
+
+        .booking-page .booking-progress {
+            display: flex;
+            align-items: flex-start;
+            width: min(500px, 100%);
+            margin: 0 auto 27px;
+        }
+
+        .booking-page .booking-step {
+            display: grid;
+            flex: 0 0 auto;
+            justify-items: center;
+            gap: 7px;
+            min-width: 62px;
+            color: #ffffffb8;
+            text-align: center;
+        }
+
+        .booking-page .booking-step > span {
+            display: grid;
+            width: 25px;
+            height: 25px;
+            place-items: center;
+            border: 1px solid #ffffff80;
+            border-radius: 50%;
+            background: #ffffff22;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .booking-page .booking-step.current > span {
+            border: 2px solid var(--booking-orange);
+            background: #fff;
+            color: #1558bf;
+        }
+
+        .booking-page .booking-step small {
+            font-size: 9px;
+            white-space: nowrap;
+        }
+
+        .booking-page .booking-progress > i {
+            flex: 1;
+            min-width: 20px;
+            margin: 12px 6px 0;
+            border-top: 1px dashed #ffffff75;
+        }
+
+        .booking-page .booking-title {
+            margin: 0 0 20px;
+        }
+
+        .booking-page .booking-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 8px;
+            color: #d7e6ff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .booking-page .booking-eyebrow span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffb53b;
+        }
+
+        .booking-page .booking-title h1 {
+            margin: 0 0 5px;
+            color: #fff;
+            font-size: clamp(25px, 3vw, 36px);
+            font-weight: 760;
+            letter-spacing: -1.25px;
+        }
+
+        .booking-page .booking-title p {
+            margin: 0;
+            color: #dce9ff;
+            font-size: 12px;
+        }
+
+        .booking-page .booking-form {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: minmax(190px, 1.15fr) minmax(115px, .65fr) minmax(190px, 1fr) auto;
+            align-items: end;
+            gap: 12px;
+            padding: 17px;
+            border: 1px solid #ffffff65;
+            border-radius: 13px;
+            background: #fff;
+            box-shadow: 0 12px 30px #092c6838;
+        }
+
+        .booking-page .booking-validation {
+            grid-column: 1 / -1;
+            color: #b42318;
+            font-size: 11px;
+        }
+
+        .booking-page .booking-validation:empty {
+            display: none;
+        }
+
+        .booking-page .booking-field {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .booking-page .booking-field label {
+            margin: 0;
+            color: #47546a;
+            font-size: 9px;
+            font-weight: 750;
+        }
+
+        .booking-page .booking-field input,
+        .booking-page .booking-field select {
+            width: 100%;
+            height: 39px;
+            min-width: 0;
+            padding: 0 10px;
+            border: 1px solid #dfe4ec;
+            border-radius: 8px;
+            outline: 0;
+            background: #fbfcfe;
+            color: #354258;
+            font: inherit;
+            font-size: 10px;
+        }
+
+        .booking-page .booking-field input:focus,
+        .booking-page .booking-field select:focus {
+            border-color: #3481ef;
+            box-shadow: 0 0 0 3px #1768e81a;
+        }
+
+        .booking-page .booking-submit {
+            display: inline-flex;
+            height: 39px;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--booking-orange);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+            box-shadow: 0 5px 12px #ed9b1e38;
+            cursor: pointer;
+        }
+
+        .booking-page .booking-submit:hover {
+            background: #ed8e00;
+        }
+
+        .booking-page .booking-submit span {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .booking-page .booking-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 44px clamp(24px, 4vw, 58px) 38px;
+        }
+
+        .booking-page .booking-success {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 22px;
+            padding: 12px 14px;
+            border: 1px solid #b9ebd0;
+            border-radius: 9px;
+            background: #f0fff6;
+            color: #18734a;
+            font-size: 11px;
+        }
+
+        .booking-page .booking-success span {
+            display: grid;
+            width: 20px;
+            height: 20px;
+            place-items: center;
+            border-radius: 50%;
+            background: #d7f7e5;
+            font-weight: 800;
+        }
+
+        .booking-page .booking-section {
+            margin-bottom: 27px;
+        }
+
+        .booking-page .booking-section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 13px;
+        }
+
+        .booking-page .section-kicker {
+            display: block;
+            margin-bottom: 4px;
+            color: #7e8ba0;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.25px;
+        }
+
+        .booking-page .booking-section-heading h2 {
+            margin: 0;
+            color: #1c283b;
+            font-size: 17px;
+            font-weight: 760;
+            letter-spacing: -.45px;
+            text-transform: capitalize;
+        }
+
+        .booking-page .section-caption {
+            color: #8d97a7;
+            font-size: 9px;
+        }
+
+        .booking-page .gallery-upload {
+            display: grid;
+            gap: 9px;
+            margin-bottom: 18px;
+            padding: 16px;
+            border: 1px solid #e4eaf2;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 5px 18px #142c4a0a;
+        }
+
+        .booking-page .gallery-upload > label {
+            color: #354258;
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .booking-page .gallery-upload-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .booking-page .gallery-upload input[type="file"] {
+            flex: 1;
+            min-width: 0;
+            padding: 9px;
+            border: 1px solid #dfe4ec;
+            border-radius: 8px;
+            background: #fbfcfe;
+            color: #526078;
+            font: inherit;
+            font-size: 10px;
+        }
+
+        .booking-page .gallery-upload button {
+            min-height: 38px;
+            padding: 0 15px;
+            border: 0;
+            border-radius: 8px;
+            background: #1056c8;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .booking-page .gallery-upload button:hover {
+            background: #0847ad;
+        }
+
+        .booking-page .gallery-upload small {
+            color: #8994a6;
+            font-size: 9px;
+        }
+
+        .booking-page .gallery-error {
+            margin-bottom: 16px;
+            padding: 11px 13px;
+            border: 1px solid #f2c7c5;
+            border-radius: 9px;
+            background: #fff5f5;
+            color: #a83530;
+            font-size: 10px;
+        }
+
+        .booking-page .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .booking-page .gallery-item {
+            overflow: hidden;
+            aspect-ratio: 4 / 3;
+            margin: 0;
+            border: 1px solid #e8ebf0;
+            border-radius: 11px;
+            background: #fff;
+            box-shadow: 0 5px 16px #142c4a0a;
+        }
+
+        .booking-page .gallery-item img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .booking-page .gallery-empty {
+            display: grid;
+            justify-items: center;
+            gap: 7px;
+            padding: 34px 18px;
+            border: 1px dashed #cbd5e3;
+            border-radius: 12px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .booking-page .gallery-empty-icon {
+            color: #4c83d8;
+            font-size: 24px;
+        }
+
+        .booking-page .gallery-empty h3 {
+            margin: 0;
+            color: #28354a;
+            font-size: 13px;
+        }
+
+        .booking-page .gallery-empty p {
+            max-width: 360px;
+            margin: 0;
+            color: #929cab;
+            font-size: 10px;
+        }
+
+        @@media (max-width: 900px) {
+            .booking-page .booking-sidebar {
+                width: 190px;
+            }
+
+            .booking-page .booking-main {
+                width: calc(100% - 190px);
+                margin-left: 190px;
+            }
+
+            .booking-page .booking-form {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .booking-page .booking-submit {
+                grid-column: 1 / -1;
+            }
+
+            .booking-page .gallery-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 620px) {
+            .booking-page .booking-sidebar {
+                position: sticky;
+                top: 0;
+                width: 58px;
+                height: 100vh;
+                padding: 17px 7px;
+                align-items: center;
+            }
+
+            .booking-page .booking-brand {
+                margin: 0 0 26px;
+                font-size: 0;
+            }
+
+            .booking-page .booking-sidebar-label,
+            .booking-page .booking-nav a:not(.active),
+            .booking-page .booking-nav a.active {
+                font-size: 0;
+            }
+
+            .booking-page .booking-nav a {
+                width: 42px;
+                justify-content: center;
+                padding: 0;
+            }
+
+            .booking-page .booking-nav-icon {
+                font-size: 16px;
+            }
+
+            .booking-page .booking-sidebar-bottom {
+                justify-content: center;
+                padding: 13px 0 0;
+            }
+
+            .booking-page .booking-sidebar-bottom span:last-child {
+                display: none;
+            }
+
+            .booking-page .booking-main {
+                width: calc(100% - 58px);
+                margin-left: 0;
+            }
+
+            .booking-page .booking-hero {
+                min-height: 0;
+                padding-bottom: 16px;
+            }
+
+            .booking-page .booking-hero-content {
+                padding: 20px 15px 0;
+            }
+
+            .booking-page .booking-progress {
+                margin-bottom: 23px;
+            }
+
+            .booking-page .booking-step {
+                min-width: 48px;
+            }
+
+            .booking-page .booking-step small {
+                font-size: 7px;
+            }
+
+            .booking-page .booking-progress > i {
+                margin-right: 2px;
+                margin-left: 2px;
+            }
+
+            .booking-page .booking-title h1 {
+                font-size: 25px;
+            }
+
+            .booking-page .booking-title p {
+                max-width: 300px;
+                font-size: 10px;
+            }
+
+            .booking-page .booking-form {
+                grid-template-columns: 1fr;
+                gap: 9px;
+                padding: 13px;
+            }
+
+            .booking-page .booking-submit {
+                grid-column: auto;
+            }
+
+            .booking-page .booking-content {
+                padding: 28px 14px;
+            }
+
+            .booking-page .booking-section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .booking-page .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-page .gallery-upload-controls {
+                align-items: stretch;
+                flex-direction: column;
+            }
+        }
+    </style>
+}

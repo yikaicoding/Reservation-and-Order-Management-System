@@ -251,6 +251,59 @@ namespace Reservation_and_Order_Management_System.Migrations
                     b.ToTable("CustomerProfiles");
                 });
 
+            modelBuilder.Entity("RestaurantReservationSystem.Models.FoodOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId")
+                        .IsUnique();
+
+                    b.ToTable("FoodOrders");
+                });
+
+            modelBuilder.Entity("RestaurantReservationSystem.Models.FoodOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FoodOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodOrderId");
+
+                    b.ToTable("FoodOrderItems");
+                });
+
             modelBuilder.Entity("RestaurantReservationSystem.Models.Reservation", b =>
                 {
                     b.Property<int>("ReservationId")
@@ -363,18 +416,39 @@ namespace Reservation_and_Order_Management_System.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestaurantReservationSystem.Models.FoodOrder", b =>
+                {
+                    b.HasOne("RestaurantReservationSystem.Models.Reservation", "Reservation")
+                        .WithOne("FoodOrder")
+                        .HasForeignKey("RestaurantReservationSystem.Models.FoodOrder", "ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("RestaurantReservationSystem.Models.FoodOrderItem", b =>
+                {
+                    b.HasOne("RestaurantReservationSystem.Models.FoodOrder", "FoodOrder")
+                        .WithMany("Items")
+                        .HasForeignKey("FoodOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FoodOrder");
+                });
+
             modelBuilder.Entity("RestaurantReservationSystem.Models.Reservation", b =>
                 {
                     b.HasOne("RestaurantReservationSystem.Models.CustomerProfile", "CustomerProfile")
                         .WithMany("Reservations")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RestaurantReservationSystem.Models.RestaurantTable", "RestaurantTable")
                         .WithMany("Reservations")
                         .HasForeignKey("RestaurantTableId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CustomerProfile");
@@ -385,6 +459,16 @@ namespace Reservation_and_Order_Management_System.Migrations
             modelBuilder.Entity("RestaurantReservationSystem.Models.CustomerProfile", b =>
                 {
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("RestaurantReservationSystem.Models.FoodOrder", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("RestaurantReservationSystem.Models.Reservation", b =>
+                {
+                    b.Navigation("FoodOrder");
                 });
 
             modelBuilder.Entity("RestaurantReservationSystem.Models.RestaurantTable", b =>

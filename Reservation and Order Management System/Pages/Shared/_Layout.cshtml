@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet"
           href="~/Reservation_and_Order_Management_System.styles.css"
           asp-append-version="true" />
@@ -19,7 +20,8 @@
     var bodyClass = ViewData["BodyClass"]?.ToString() ?? "";
     var isProfilePage = bodyClass == "profile-page";
     var isBookingPage = bodyClass == "booking-page";
-    var isStandalonePage = isProfilePage || isBookingPage;
+    var isOrderPage = ViewData["BodyClass"]?.ToString() == "order-page";
+    var isStandalonePage = isProfilePage || isBookingPage || isOrderPage;
 }
 
 <body class="@bodyClass">
@@ -64,6 +66,15 @@
                 </div>
             </nav>
         </header>
+    }
+
+    @if (isProfilePage || isBookingPage || isOrderPage)
+    {
+        @if (TempData["Message"] is string profileMessage)
+        {
+            <div class="alert alert-success">@profileMessage</div>
+        }
+        @RenderBody()
     }
 
     @if (isStandalonePage)

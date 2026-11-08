@@ -23,9 +23,31 @@ public class ApplicationDbContext
     public DbSet<Reservation> Reservations =>
         Set<Reservation>();
 
+    public DbSet<FoodOrder> FoodOrders => 
+        Set<FoodOrder>();
+
+    public DbSet<FoodOrderItem> FoodOrderItems => 
+        Set<FoodOrderItem>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<FoodOrder>()
+            .HasIndex(order => order.ReservationId)
+            .IsUnique();
+
+        builder.Entity<FoodOrder>()
+            .HasOne(order => order.Reservation)
+            .WithOne(reservation => reservation.FoodOrder)
+            .HasForeignKey<FoodOrder>(order => order.ReservationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<FoodOrderItem>()
+            .HasOne(item => item.FoodOrder)
+            .WithMany(order => order.Items)
+            .HasForeignKey(item => item.FoodOrderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Reservation>()
             .HasOne(reservation => reservation.CustomerProfile)

@@ -11,15 +11,25 @@ using RestaurantReservationSystem.Models;
 namespace Reservation_and_Order_Management_System.Pages.Reservations;
 
 [Authorize]
-public class CreateModel(ApplicationDbContext db) : PageModel
+public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environment) : PageModel
 {
+    private const long MaximumGalleryImageSize = 5 * 1024 * 1024;
+    private static readonly HashSet<string> AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+
     [BindProperty]
     public ReservationInput Input { get; set; } = new();
 
     public List<RestaurantTable> Tables { get; set; } = new();
 
+    public List<string> GalleryImages { get; set; } = [];
+    public bool CanManageGallery => User.IsInRole("Staff");
+
     private string UserId =>
         User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+    private string GalleryDirectory => 
+        Path.Combine(environment.WebRootPath, "uploads", "restaurant-gallery");
+
 
     public async Task OnGetAsync()
     {
@@ -28,6 +38,84 @@ public class CreateModel(ApplicationDbContext db) : PageModel
             -(defaultStart.Ticks % TimeSpan.TicksPerMinute));
 
         await LoadTablesAsync();
+        LoadGalleryImages();
+    }
+
+    private void LoadGalleryImages()
+    {
+        if (!Directory.Exists(GalleryDirectory))
+        {
+            GalleryImages = [];
+            return;
+        }
+
+        GalleryImages = Directory.EnumerateFiles(GalleryDirectory)
+            .Where(path => AllowedImageExtensions.Contains(Path.GetExtension(path).ToLowerInvariant()))
+            .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
+            .Select(path => $"/uploads/restaurant-gallery/{Path.GetFileName(path)}")
+            .ToList();
+    }
+
+    public async Task<IActionResult> OnPostUploadImageAsync(IFormFile? image)
+    {
+        if (!CanManageGallery)
+        {
+            return Forbid();
+        }
+
+        if (image is null || image.Length == 0)
+        {
+            TempData["UploadError"] = "Choose an image file to upload.";
+            return RedirectToPage();
+        }
+
+        if (image.Length > MaximumGalleryImageSize)
+        {
+            TempData["UploadError"] = "Image files must be 5 MB or smaller.";
+            return RedirectToPage();
+        }
+
+        var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+        if (!AllowedImageExtensions.Contains(extension) || !await HasValidImageSignatureAsync(image, extension))
+        {
+            TempData["UploadError"] = "Upload a valid JPG, PNG, or WebP image.";
+            return RedirectToPage();
+        }
+
+        Directory.CreateDirectory(GalleryDirectory);
+        var fileName = $"{Guid.NewGuid():N}{extension}";
+        var destination = Path.Combine(GalleryDirectory, fileName);
+
+        await using (var output = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        {
+            await image.CopyToAsync(output);
+        }
+
+        TempData["UploadMessage"] = "Image uploaded to the restaurant gallery.";
+        return RedirectToPage();
+    }
+
+    private static async Task<bool> HasValidImageSignatureAsync(IFormFile image, string extension)
+    {
+        var header = new byte[12];
+        await using var input = image.OpenReadStream();
+        var bytesRead = 0;
+
+        while (bytesRead < header.Length)
+        {
+            var count = await input.ReadAsync(header.AsMemory(bytesRead));
+            if (count == 0) break;
+            bytesRead += count;
+        }
+
+        return extension switch
+        {
+            ".jpg" or ".jpeg" => bytesRead >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+            ".png" => bytesRead >= 8 && header.AsSpan(0, 8).SequenceEqual(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }),
+            ".webp" => bytesRead >= 12 && header.AsSpan(0, 4).SequenceEqual("RIFF"u8) && header.AsSpan(8, 4).SequenceEqual("WEBP"u8),
+            _ => false
+        };
     }
 
     private async Task LoadTablesAsync()
@@ -40,7 +128,9 @@ public class CreateModel(ApplicationDbContext db) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        
         await LoadTablesAsync();
+        LoadGalleryImages();
 
         if (!ModelState.IsValid)
             return Page();
