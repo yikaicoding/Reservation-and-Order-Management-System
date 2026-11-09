@@ -67,6 +67,9 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
 
             TempData["SuccessMessage"] = $"Table {table.TableNumber} reserved successfully for {ReservationInput.ReservationDate:dd MMM yyyy} ({ReservationInput.TimeSlot})!";
             return RedirectToPage("/Customer/ReserveTable");
+
+            TempData["SuccessMessage"] = $"Table {table.TableNumber} reserved successfully for {ReservationInput.ReservationDate:dd MMM yyyy} ({ReservationInput.TimeSlot})!";
+            return RedirectToPage("/Customer/Confirmation");
         }
 
         private async Task LoadAvailableTablesAsync()
