@@ -38,6 +38,14 @@ public class LoginModel(SignInManager<IdentityUser> signIn) : PageModel
         if (!string.IsNullOrWhiteSpace(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             return LocalRedirect(ReturnUrl);
 
-        return RedirectToPage("/Reservations/Create");
+        //Send each role to its own area
+        var user = await signIn.UserManager.FindByEmailAsync(Email);
+        if (user != null && await signIn.UserManager.IsInRoleAsync(user, "Admin"))
+            return RedirectToPage("/Admin/ManageTables");
+
+        if (user != null && await signIn.UserManager.IsInRoleAsync(user, "Staff"))
+            return RedirectToPage("/Staff/Reservations");
+
+        return RedirectToPage("/Customer/Dashboard");
     }
 }

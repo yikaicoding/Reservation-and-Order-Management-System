@@ -1,8 +1,8 @@
 ﻿@page
-@model ConfirmationModel
+@model Reservation_and_Order_Management_System.Pages.Customer.ConfirmationModel
 
 @{
-    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+    Layout = "_Layout";
 
     ViewData["Title"] = "Confirmation";
     ViewData["HeaderTitle"] = "Reservation Confirmed";
@@ -28,7 +28,8 @@
     <p>Time: @Model.ReservationTime</p>
     <p>Table: @Model.TableNumber</p>
 
-    <a asp-page="/Reservations/Voucher"
+    <a asp-page="/Customer/Voucher"
+       asp-route-id="@Request.Query["id"]"
        class="btn btn-primary">
         View Voucher
     </a>

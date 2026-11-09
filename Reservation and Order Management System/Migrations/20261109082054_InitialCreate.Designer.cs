@@ -12,7 +12,7 @@ using Reservation_and_Order_Management_System.Data;
 namespace Reservation_and_Order_Management_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261108045948_InitialCreate")]
+    [Migration("20261109082054_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Reservation_and_Order_Management_System.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.14")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -223,7 +223,40 @@ namespace Reservation_and_Order_Management_System.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.CustomerProfile", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Customer", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("CustomerId");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.CustomerProfile", b =>
                 {
                     b.Property<string>("CustomerId")
                         .HasColumnType("nvarchar(450)");
@@ -254,7 +287,60 @@ namespace Reservation_and_Order_Management_System.Migrations
                     b.ToTable("CustomerProfiles");
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.Reservation", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.FoodOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId")
+                        .IsUnique();
+
+                    b.ToTable("FoodOrders");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.FoodOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FoodOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodOrderId");
+
+                    b.ToTable("FoodOrderItem");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Reservation", b =>
                 {
                     b.Property<int>("ReservationId")
                         .ValueGeneratedOnAdd()
@@ -262,18 +348,48 @@ namespace Reservation_and_Order_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationId"));
 
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomerProfileCustomerId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DietaryRequirements")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("EndsAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("NumberOfGuests")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Occasion")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int>("PartySize")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("ReservationTime")
+                        .HasColumnType("time");
+
                     b.Property<int>("RestaurantTableId")
                         .HasColumnType("int");
+
+                    b.Property<string>("SeatingPreference")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SpecialRequests")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("StartsAt")
                         .HasColumnType("datetime2");
@@ -287,12 +403,14 @@ namespace Reservation_and_Order_Management_System.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("RestaurantTableId", "StartsAt");
+                    b.HasIndex("CustomerProfileCustomerId");
+
+                    b.HasIndex("RestaurantTableId");
 
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.RestaurantTable", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.RestaurantTable", b =>
                 {
                     b.Property<int>("RestaurantTableId")
                         .ValueGeneratedOnAdd()
@@ -303,16 +421,71 @@ namespace Reservation_and_Order_Management_System.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<string>("DiningArea")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TableNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("RestaurantTableId");
 
-                    b.ToTable("DiningTables");
+                    b.HasIndex("TableNumber")
+                        .IsUnique();
+
+                    b.ToTable("RestaurantTables");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Review", b =>
+                {
+                    b.Property<int>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
+
+                    b.Property<int>("AmbienceRating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FoodRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OverallRating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceRating")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("ReservationId")
+                        .IsUnique();
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -366,33 +539,77 @@ namespace Reservation_and_Order_Management_System.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.Reservation", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.FoodOrder", b =>
                 {
-                    b.HasOne("RestaurantReservationSystem.Models.CustomerProfile", "CustomerProfile")
-                        .WithMany("Reservations")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("Reservation_and_Order_Management_System.Models.Reservation", "Reservation")
+                        .WithOne("FoodOrder")
+                        .HasForeignKey("Reservation_and_Order_Management_System.Models.FoodOrder", "ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RestaurantReservationSystem.Models.RestaurantTable", "RestaurantTable")
-                        .WithMany("Reservations")
-                        .HasForeignKey("RestaurantTableId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.FoodOrderItem", b =>
+                {
+                    b.HasOne("Reservation_and_Order_Management_System.Models.FoodOrder", "FoodOrder")
+                        .WithMany("Items")
+                        .HasForeignKey("FoodOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FoodOrder");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Reservation", b =>
+                {
+                    b.HasOne("Reservation_and_Order_Management_System.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Reservation_and_Order_Management_System.Models.CustomerProfile", "CustomerProfile")
+                        .WithMany("Reservations")
+                        .HasForeignKey("CustomerProfileCustomerId");
+
+                    b.HasOne("Reservation_and_Order_Management_System.Models.RestaurantTable", "RestaurantTable")
+                        .WithMany()
+                        .HasForeignKey("RestaurantTableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("CustomerProfile");
 
                     b.Navigation("RestaurantTable");
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.CustomerProfile", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Review", b =>
+                {
+                    b.HasOne("Reservation_and_Order_Management_System.Models.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.CustomerProfile", b =>
                 {
                     b.Navigation("Reservations");
                 });
 
-            modelBuilder.Entity("RestaurantReservationSystem.Models.RestaurantTable", b =>
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.FoodOrder", b =>
                 {
-                    b.Navigation("Reservations");
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Reservation_and_Order_Management_System.Models.Reservation", b =>
+                {
+                    b.Navigation("FoodOrder");
                 });
 #pragma warning restore 612, 618
         }

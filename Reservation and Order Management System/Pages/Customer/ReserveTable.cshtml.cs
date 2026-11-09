@@ -35,12 +35,24 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
 
         public async Task<IActionResult> OnGetAsync()
         {
+            //Must be logged in (US01 session)
+            if (HttpContext.Session.GetInt32("CustomerId") == null)
+            {
+                return RedirectToPage("/Customer/Login");
+            }
+
             await LoadAvailableTablesAsync();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            //Must be logged in (US01 session)
+            if (HttpContext.Session.GetInt32("CustomerId") == null)
+            {
+                return RedirectToPage("/Customer/Login");
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadAvailableTablesAsync();
@@ -65,8 +77,47 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
                 return Page();
             }
 
-            TempData["SuccessMessage"] = $"Table {table.TableNumber} reserved successfully for {ReservationInput.ReservationDate:dd MMM yyyy} ({ReservationInput.TimeSlot})!";
-            return RedirectToPage("/Customer/ReserveTable");
+            // Start time from the time slot, e.g. "18:00 - 20:00" -> 18:00
+            var startText = ReservationInput.TimeSlot.Split('-')[0].Trim();
+            if (!TimeSpan.TryParse(startText, out var startTime))
+            {
+                startTime = new TimeSpan(18, 0, 0);
+            }
+
+            var start = ReservationInput.ReservationDate.Date.Add(startTime);
+            var end = start.AddHours(2);
+
+            // No bookings in the past
+            if (start <= DateTime.Now)
+            {
+                ModelState.AddModelError(string.Empty, "Please choose a date and time in the future.");
+                await LoadAvailableTablesAsync();
+                return Page();
+            }
+
+            // Double-booking check (US05): same table, overlapping time, not cancelled
+            bool overlaps = await _context.Reservations.AnyAsync(r =>
+                r.RestaurantTableId == table.RestaurantTableId &&
+                r.Status != "Cancelled" &&
+                r.StartsAt < end &&
+                r.EndsAt > start);
+
+            if (overlaps)
+            {
+                ModelState.AddModelError(string.Empty,
+                    $"Table {table.TableNumber} is already booked for that time. Please choose another table or time slot.");
+                await LoadAvailableTablesAsync();
+                return Page();
+            }
+
+            // Go to step 3 - Dining Preferences (US06)
+            return RedirectToPage("/Customer/DiningPreferences", new
+            {
+                date = start.ToString("yyyy-MM-dd"),
+                time = startTime.ToString(@"hh\:mm"),
+                guests = ReservationInput.NumberOfGuests,
+                tableId = table.RestaurantTableId
+            });
         }
 
         private async Task LoadAvailableTablesAsync()

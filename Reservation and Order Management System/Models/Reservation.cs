@@ -55,5 +55,16 @@ namespace Reservation_and_Order_Management_System.Models
         [StringLength(500)]
         [Display(Name = "Special Requests")]
         public string? SpecialRequests { get; set; }
+
+        //Member 2 fields (US05/US09/US13)
+        public RestaurantTable? RestaurantTable { get; set; }
+        public CustomerProfile? CustomerProfile { get; set; }
+        public FoodOrder? FoodOrder { get; set; }
+
+        public DateTime StartsAt { get; set; }
+        public DateTime EndsAt { get; set; }
+
+        [Range(1, 20)]
+        public int PartySize { get; set; }
     }
 }

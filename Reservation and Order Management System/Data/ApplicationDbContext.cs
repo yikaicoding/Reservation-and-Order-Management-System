@@ -19,5 +19,9 @@ namespace Reservation_and_Order_Management_System.Data
         public DbSet<Reservation> Reservations { get; set; }
 
         public DbSet<Review> Reviews { get; set; }
+
+        public DbSet<CustomerProfile> CustomerProfiles { get; set; }
+        
+        public DbSet<FoodOrder> FoodOrders { get; set; }
     }
 }

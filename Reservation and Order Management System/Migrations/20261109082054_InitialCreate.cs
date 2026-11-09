@@ -67,18 +67,37 @@ namespace Reservation_and_Order_Management_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DiningTables",
+                name: "Customers",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.CustomerId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RestaurantTables",
                 columns: table => new
                 {
                     RestaurantTableId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TableName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TableNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    DiningArea = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TableName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DiningTables", x => x.RestaurantTableId);
+                    table.PrimaryKey("PK_RestaurantTables", x => x.RestaurantTableId);
                 });
 
             migrationBuilder.CreateTable(
@@ -193,28 +212,109 @@ namespace Reservation_and_Order_Management_System.Migrations
                 {
                     ReservationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
                     RestaurantTableId = table.Column<int>(type: "int", nullable: false),
+                    ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReservationTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    NumberOfGuests = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SeatingPreference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Occasion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    DietaryRequirements = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    SpecialRequests = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CustomerProfileCustomerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StartsAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndsAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PartySize = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                    PartySize = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reservations", x => x.ReservationId);
                     table.ForeignKey(
-                        name: "FK_Reservations_CustomerProfiles_CustomerId",
-                        column: x => x.CustomerId,
+                        name: "FK_Reservations_CustomerProfiles_CustomerProfileCustomerId",
+                        column: x => x.CustomerProfileCustomerId,
                         principalTable: "CustomerProfiles",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "CustomerId");
                     table.ForeignKey(
-                        name: "FK_Reservations_DiningTables_RestaurantTableId",
+                        name: "FK_Reservations_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reservations_RestaurantTables_RestaurantTableId",
                         column: x => x.RestaurantTableId,
-                        principalTable: "DiningTables",
+                        principalTable: "RestaurantTables",
                         principalColumn: "RestaurantTableId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FoodOrders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReservationId = table.Column<int>(type: "int", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FoodOrders_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "ReservationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    ReviewId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReservationId = table.Column<int>(type: "int", nullable: false),
+                    FoodRating = table.Column<int>(type: "int", nullable: false),
+                    ServiceRating = table.Column<int>(type: "int", nullable: false),
+                    AmbienceRating = table.Column<int>(type: "int", nullable: false),
+                    OverallRating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.ReviewId);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "ReservationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FoodOrderItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FoodOrderId = table.Column<int>(type: "int", nullable: false),
+                    ItemName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodOrderItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FoodOrderItem_FoodOrders_FoodOrderId",
+                        column: x => x.FoodOrderId,
+                        principalTable: "FoodOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -257,14 +357,42 @@ namespace Reservation_and_Order_Management_System.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FoodOrderItem_FoodOrderId",
+                table: "FoodOrderItem",
+                column: "FoodOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodOrders_ReservationId",
+                table: "FoodOrders",
+                column: "ReservationId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CustomerId",
                 table: "Reservations",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_RestaurantTableId_StartsAt",
+                name: "IX_Reservations_CustomerProfileCustomerId",
                 table: "Reservations",
-                columns: new[] { "RestaurantTableId", "StartsAt" });
+                column: "CustomerProfileCustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_RestaurantTableId",
+                table: "Reservations",
+                column: "RestaurantTableId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RestaurantTables_TableNumber",
+                table: "RestaurantTables",
+                column: "TableNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ReservationId",
+                table: "Reviews",
+                column: "ReservationId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -286,7 +414,10 @@ namespace Reservation_and_Order_Management_System.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "FoodOrderItem");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -295,10 +426,19 @@ namespace Reservation_and_Order_Management_System.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "FoodOrders");
+
+            migrationBuilder.DropTable(
+                name: "Reservations");
+
+            migrationBuilder.DropTable(
                 name: "CustomerProfiles");
 
             migrationBuilder.DropTable(
-                name: "DiningTables");
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "RestaurantTables");
         }
     }
 }

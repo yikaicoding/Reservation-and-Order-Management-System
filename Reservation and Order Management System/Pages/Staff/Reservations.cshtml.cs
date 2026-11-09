@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Reservation_and_Order_Management_System.Data;
-using RestaurantReservationSystem.Models;
+using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Pages.Staff;
 
@@ -60,7 +60,7 @@ public class ReservationsModel(ApplicationDbContext db) : PageModel
             TempData["Message"] = "Only pending or confirmed reservations can be changed.";
             return RedirectToPage();
         }
-        var table = await db.DiningTables.SingleOrDefaultAsync(item => item.RestaurantTableId == Input.RestaurantTableId && item.IsActive);
+        var table = await db.RestaurantTables.SingleOrDefaultAsync(item => item.RestaurantTableId == Input.RestaurantTableId && item.IsActive);
         if (table is null || table.Capacity < Input.PartySize)
         {
             ModelState.AddModelError("Input.RestaurantTableId", "Choose an active table that fits the party.");
@@ -106,7 +106,7 @@ public class ReservationsModel(ApplicationDbContext db) : PageModel
             .Include(item => item.RestaurantTable).AsQueryable();
         if (!string.IsNullOrWhiteSpace(status) && status != "All") query = query.Where(item => item.Status == status);
         Reservations = await query.OrderBy(item => item.StartsAt).ThenBy(item => item.ReservationId).ToListAsync();
-        Tables = await db.DiningTables.AsNoTracking().Where(item => item.IsActive).OrderBy(item => item.TableName).ToListAsync();
+        Tables = await db.RestaurantTables.AsNoTracking().Where(item => item.IsActive).OrderBy(item => item.TableName).ToListAsync();
     }
 
     public class ReservationUpdate

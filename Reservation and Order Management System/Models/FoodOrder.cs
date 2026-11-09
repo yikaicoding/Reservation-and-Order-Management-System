@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RestaurantReservationSystem.Models;
+namespace Reservation_and_Order_Management_System.Models;
 
 public class FoodOrder
 {

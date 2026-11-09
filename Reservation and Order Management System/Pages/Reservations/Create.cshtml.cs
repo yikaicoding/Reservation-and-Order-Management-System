@@ -1,16 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Reservation_and_Order_Management_System.Data;
-using RestaurantReservationSystem.Models;
+using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Pages.Reservations;
 
-[Authorize]
 public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environment) : PageModel
 {
     private const long MaximumGalleryImageSize = 5 * 1024 * 1024;
@@ -24,21 +21,27 @@ public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environmen
     public List<string> GalleryImages { get; set; } = [];
     public bool CanManageGallery => User.IsInRole("Staff");
 
-    private string UserId =>
-        User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    //Customer from our session login (US01)
+    private int UserId => HttpContext.Session.GetInt32("CustomerId") ?? 0;
 
-    private string GalleryDirectory => 
+    private string GalleryDirectory =>
         Path.Combine(environment.WebRootPath, "uploads", "restaurant-gallery");
 
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        if (UserId == 0 && !CanManageGallery)
+        {
+            return RedirectToPage("/Customer/Login");
+        }
+
         var defaultStart = DateTime.Now.AddMinutes(30);
         Input.StartsAt = defaultStart.AddTicks(
             -(defaultStart.Ticks % TimeSpan.TicksPerMinute));
 
         await LoadTablesAsync();
         LoadGalleryImages();
+        return Page();
     }
 
     private void LoadGalleryImages()
@@ -120,7 +123,7 @@ public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environmen
 
     private async Task LoadTablesAsync()
     {
-        Tables = await db.DiningTables
+        Tables = await db.RestaurantTables
             .Where(table => table.IsActive)
             .OrderBy(table => table.TableName)
             .ToListAsync();
@@ -128,26 +131,19 @@ public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environmen
 
     public async Task<IActionResult> OnPostAsync()
     {
-        
+        //Must be logged in as a customer
+        if (UserId == 0)
+        {
+            return RedirectToPage("/Customer/Login");
+        }
+
         await LoadTablesAsync();
         LoadGalleryImages();
 
         if (!ModelState.IsValid)
             return Page();
 
-        var profile = await db.CustomerProfiles
-            .SingleOrDefaultAsync(customer => customer.CustomerId == UserId);
-
-        if (profile is null)
-        {
-            ModelState.AddModelError(
-                "",
-                "Complete your customer profile before booking.");
-
-            return Page();
-        }
-
-        var table = await db.DiningTables
+        var table = await db.RestaurantTables
             .SingleOrDefaultAsync(table =>
                 table.RestaurantTableId == Input.RestaurantTableId &&
                 table.IsActive);
@@ -175,11 +171,15 @@ public class CreateModel(ApplicationDbContext db, IWebHostEnvironment environmen
 
         var reservation = new Reservation
         {
-            CustomerId = profile.CustomerId,
+            CustomerId = UserId,
             RestaurantTableId = table.RestaurantTableId,
             StartsAt = start,
             EndsAt = end,
             PartySize = Input.PartySize,
+            //Fields used by Order History / Dashboard (US11)
+            ReservationDate = start.Date,
+            ReservationTime = start.TimeOfDay,
+            NumberOfGuests = Input.PartySize,
             Status = "Pending"
         };
 

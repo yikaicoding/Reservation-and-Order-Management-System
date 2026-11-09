@@ -22,5 +22,10 @@ namespace Reservation_and_Order_Management_System.Models
 
         [Required]
         public string Status { get; set; } = "Available";
+
+        [Required]
+        public string TableName { get; set; } = "";
+
+        public bool IsActive { get; set; } = true;
     }
 }

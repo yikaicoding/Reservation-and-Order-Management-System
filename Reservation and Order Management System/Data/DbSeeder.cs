@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestaurantReservationSystem.Models;
+using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Data;
 
@@ -22,12 +22,12 @@ public static class DbSeeder
 
         foreach (var sample in sampleTables)
         {
-            var existingTable = await db.DiningTables
+            var existingTable = await db.RestaurantTables
                 .SingleOrDefaultAsync(table => table.TableName == sample.Name);
 
             if (existingTable is null)
             {
-                db.DiningTables.Add(new RestaurantTable
+                db.RestaurantTables.Add(new RestaurantTable
                 {
                     TableName = sample.Name,
                     Capacity = sample.Capacity,

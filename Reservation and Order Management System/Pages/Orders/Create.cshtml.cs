@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Reservation_and_Order_Management_System.Data;
-using RestaurantReservationSystem.Models;
+using Reservation_and_Order_Management_System.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 
 namespace Reservation_and_Order_Management_System.Pages.Orders;
 
-[Authorize]
 public class CreateModel(ApplicationDbContext db) : PageModel
 {
     [BindProperty, Range(1, int.MaxValue)]
@@ -20,12 +17,19 @@ public class CreateModel(ApplicationDbContext db) : PageModel
 
     public List<Reservation> Reservations { get; set; } = [];
 
-    private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    //Customer from our session login (US01)
+    private int UserId => HttpContext.Session.GetInt32("CustomerId") ?? 0;
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        if (UserId == 0)
+        {
+            return RedirectToPage("/Customer/Login");
+        }
+
         Lines = [new(), new()];
         await LoadReservationsAsync();
+        return Page();
     }
 
     private async Task LoadReservationsAsync()
@@ -42,6 +46,11 @@ public class CreateModel(ApplicationDbContext db) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (UserId == 0)
+        {
+            return RedirectToPage("/Customer/Login");
+        }
+
         await LoadReservationsAsync();
 
         var selectedReservation = await db.Reservations
@@ -125,5 +134,3 @@ public class CreateModel(ApplicationDbContext db) : PageModel
         public int Quantity { get; set; } = 1;
     }
 }
-
-

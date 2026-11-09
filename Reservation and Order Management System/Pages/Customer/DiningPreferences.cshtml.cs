@@ -134,6 +134,9 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
                 ReservationTime = Time,
                 NumberOfGuests = Guests,
                 Status = "Pending",
+                StartsAt = Date.Date.Add(Time),
+                EndsAt = Date.Date.Add(Time).AddHours(2),
+                PartySize = Guests,
                 SeatingPreference = SeatingPreference,
                 Occasion = Occasion,
                 DietaryRequirements = dietaryText,
@@ -146,7 +149,7 @@ namespace Reservation_and_Order_Management_System.Pages.Customer
             await _context.SaveChangesAsync();
 
             //Go to step 4 - Confirm Booking (Member 4, US07)
-            return RedirectToPage("/Customer/ConfirmBooking", new { id = reservation.ReservationId });
+            return RedirectToPage("/Customer/Confirmation", new { id = reservation.ReservationId });
         }
 
 

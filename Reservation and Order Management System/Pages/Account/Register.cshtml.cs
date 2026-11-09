@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Reservation_and_Order_Management_System.Data;
-using RestaurantReservationSystem.Models;
+using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Pages.Account;
 
