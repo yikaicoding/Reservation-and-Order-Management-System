@@ -1,0 +1,85 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Customer.ReserveTableModel
+@{
+    ViewData["Title"] = "Reserve a Table";
+}
+
+<div class="container py-4">
+    <!-- Hero Banner -->
+    <div class="p-4 mb-4 bg-primary text-white rounded-3 shadow-sm">
+        <h1 class="display-6 fw-bold">Skip the queue, just dine.</h1>
+        <p class="lead mb-0">Select your dining area, schedule date and time, and secure instant confirmation.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 text-primary">Table Reservation Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Table Picker -->
+                        <div class="mb-3">
+                            <label asp-for="ReservationInput.RestaurantTableId" class="form-label fw-semibold">Choose Table &amp; Dining Area</label>
+                            <select asp-for="ReservationInput.RestaurantTableId" asp-items="Model.TableOptions" class="form-select">
+                                <option value="">-- Choose an Available Table --</option>
+                            </select>
+                            <span asp-validation-for="ReservationInput.RestaurantTableId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <!-- Date -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReservationInput.ReservationDate" class="form-label fw-semibold">Dining Date</label>
+                                <input asp-for="ReservationInput.ReservationDate" type="date" class="form-control" />
+                                <span asp-validation-for="ReservationInput.ReservationDate" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Time Slot -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReservationInput.TimeSlot" class="form-label fw-semibold">Time Slot</label>
+                                <select asp-for="ReservationInput.TimeSlot" class="form-select">
+                                    <option value="12:00 - 14:00">Lunch (12:00 PM – 02:00 PM)</option>
+                                    <option value="18:00 - 20:00">Dinner Session 1 (06:00 PM – 08:00 PM)</option>
+                                    <option value="20:00 - 22:00">Dinner Session 2 (08:00 PM – 10:00 PM)</option>
+                                </select>
+                                <span asp-validation-for="ReservationInput.TimeSlot" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Guest Count -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReservationInput.NumberOfGuests" class="form-label fw-semibold">Number of Guests</label>
+                                <input asp-for="ReservationInput.NumberOfGuests" type="number" min="1" max="20" class="form-control" />
+                                <span asp-validation-for="ReservationInput.NumberOfGuests" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Special Requests -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReservationInput.SpecialRequests" class="form-label fw-semibold">Special Request (Optional)</label>
+                                <input asp-for="ReservationInput.SpecialRequests" class="form-control" placeholder="e.g. Baby chair, Window seat" />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Confirm Reservation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

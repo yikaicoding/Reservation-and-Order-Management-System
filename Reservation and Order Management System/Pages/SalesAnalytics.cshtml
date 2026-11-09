@@ -1,0 +1,204 @@
+﻿@page
+@model SalesAnalyticsModel
+
+@{
+    Layout = "/Pages/Shared/Shared_Layout.cshtml";
+
+    ViewData["Title"] = "Analytics";
+    ViewData["HeaderTitle"] = "Business Analytics";
+    ViewData["HeaderSubtitle"] = "Revenue, reservations and operations.";
+}
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6>Total Revenue</h6>
+                <h3>RM @Model.TotalRevenue</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6>Total Orders</h6>
+                <h3>@Model.TotalOrders</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6>Reservations</h6>
+                <h3>@Model.TotalReservations</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6>Customers</h6>
+                <h3>@Model.TotalCustomers</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-header">
+                Revenue Trend
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="revenueChart"
+                        height="120">
+                </canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                Order Status Overview
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    Preparing:
+                    @Model.PreparingOrders
+                </p>
+
+                <p>
+                    Ready:
+                    @Model.ReadyOrders
+                </p>
+
+                <p>
+                    Completed:
+                    @Model.CompletedOrders
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-3">
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                Top Selling Items
+            </div>
+
+            <div class="card-body">
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Sold</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.TopSellingItems)
+                        {
+                            <tr>
+                                <td>@item.ItemName</td>
+                                <td>@item.QuantitySold</td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                Peak Reservation Hours
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="reservationChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const revenueChart =
+        document.getElementById('revenueChart');
+
+        new Chart(revenueChart, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Revenue',
+                    data: []
+                }]
+            }
+        });
+
+        const reservationChart =
+        document.getElementById('reservationChart');
+
+        new Chart(reservationChart,{
+            type:'bar',
+            data:{
+                labels:[],
+                datasets:[{
+                    label:'Reservations',
+                    data:[]
+                }]
+            }
+        });
+
+    </script>
+
+}
