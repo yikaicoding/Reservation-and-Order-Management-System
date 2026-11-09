@@ -1,0 +1,55 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Customer.PreferencesModel
+@{
+    ViewData["Title"] = "Dining Preferences";
+}
+
+<div class="container py-4">
+    <!-- Wizard Step Bar -->
+    <div class="d-flex justify-content-center align-items-center mb-4 text-center">
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">1</div> <span class="me-4 fw-semibold text-muted">Select Details</span>
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">2</div> <span class="me-4 fw-semibold text-muted">Pick Table</span>
+        <div class="badge rounded-circle bg-primary text-white p-3 me-2">3</div> <span class="me-4 fw-bold text-primary">Preferences</span>
+        <div class="badge rounded-circle bg-secondary text-white p-3 me-2">4</div> <span class="text-muted">Confirm</span>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm p-4">
+                <h3 class="fw-bold text-primary mb-2">Dining Preferences</h3>
+                <p class="text-muted mb-4">Customize your dining experience and inform staff of any dietary restrictions.</p>
+
+                <form method="post">
+                    <input type="hidden" asp-for="TableId" />
+                    <input type="hidden" asp-for="Date" />
+                    <input type="hidden" asp-for="TimeSlot" />
+                    <input type="hidden" asp-for="Guests" />
+
+                    <!-- Dietary Restrictions -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Dietary Preferences / Restrictions</label>
+                        <select asp-for="DietaryRequirements" class="form-select">
+                            <option value="None">No specific dietary restrictions</option>
+                            <option value="Halal">Halal</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Nut Allergy">Nut Allergy</option>
+                            <option value="Gluten-Free">Gluten-Free</option>
+                        </select>
+                    </div>
+
+                    <!-- Special Requests -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Special Seating or Dining Requests (Optional)</label>
+                        <textarea asp-for="SpecialRequests" class="form-control" rows="4" placeholder="e.g., Baby chair required, high chair near window, anniversary celebration..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-page="/Customer/SelectTable" asp-route-date="@Model.Date.ToString("yyyy-MM-dd")" asp-route-timeSlot="@Model.TimeSlot" asp-route-guests="@Model.Guests" class="btn btn-outline-secondary px-4">Back</a>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">Proceed to Confirmation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,33 +1,55 @@
 ﻿@page
 @model Reservation_and_Order_Management_System.Pages.Customer.ConfirmationModel
 @{
-    ViewData["Title"] = "Reservation Confirmed";
+    ViewData["Title"] = "Booking Confirmation";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <div class="card shadow border-0 rounded-3">
-                <div class="card-body p-5">
-                    <div class="mb-4 text-success">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l5-6.02a.75.75 0 0 0-.05-1.07z" />
-                        </svg>
-                    </div>
-                    <h2 class="fw-bold mb-2">Reservation Confirmed!</h2>
-                    <p class="text-muted mb-4">Your table booking has been successfully recorded in our system.</p>
+<div class="container py-4">
+    <!-- Wizard Step Bar -->
+    <div class="d-flex justify-content-center align-items-center mb-4 text-center">
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">1</div> <span class="me-4 fw-semibold text-muted">Select Details</span>
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">2</div> <span class="me-4 fw-semibold text-muted">Pick Table</span>
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">3</div> <span class="me-4 fw-semibold text-muted">Preferences</span>
+        <div class="badge rounded-circle bg-primary text-white p-3 me-2">4</div> <span class="fw-bold text-primary">Confirm</span>
+    </div>
 
-                    @if (TempData["SuccessMessage"] != null)
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg text-center p-4">
+                <div class="text-success display-3 mb-2">
+                    <i class="bi bi-check-circle-fill"></i> &#10004;
+                </div>
+                <h3 class="fw-bold mb-1">Reservation Confirmed!</h3>
+                <p class="text-muted mb-4">Your table has been reserved. Please present this voucher upon arrival.</p>
+
+                <div class="bg-light p-3 rounded text-start mb-4 border">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Booking Reference:</span>
+                        <strong class="text-primary">#RES-@Model.CurrentReservation.ReservationId</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Table:</span>
+                        <strong>Table @Model.ReservedTable.TableNumber (@Model.ReservedTable.DiningArea)</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Date & Time:</span>
+                        <strong>@Model.CurrentReservation.ReservationDate.ToString("yyyy-MM-dd") (@Model.CurrentReservation.TimeSlot)</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Guests:</span>
+                        <strong>@Model.CurrentReservation.NumberOfGuests pax</strong>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.CurrentReservation.SpecialRequests))
                     {
-                        <div class="alert alert-success mb-4" role="alert">
-                            @TempData["SuccessMessage"]
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Requests:</span>
+                            <span class="small text-end">@Model.CurrentReservation.SpecialRequests</span>
                         </div>
                     }
+                </div>
 
-                    <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a href="/Customer/ReserveTable" class="btn btn-outline-primary px-4">Book Another Table</a>
-                        <button onclick="window.print()" class="btn btn-primary px-4">Print Voucher</button>
-                    </div>
+                <div class="d-grid gap-2">
+                    <a asp-page="/Customer/ReserveTable" class="btn btn-primary fw-bold py-2">Make Another Booking</a>
                 </div>
             </div>
         </div>
