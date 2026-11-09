@@ -1,0 +1,50 @@
+﻿@page
+@model ReviewBookingModel
+
+@{
+    Layout = "_Layout";
+
+    ViewData["Title"] = "Review Booking";
+    ViewData["HeaderTitle"] = "Review Your Booking";
+    ViewData["HeaderSubtitle"] = "Please verify all information before confirming.";
+}
+
+<div class="card shadow-sm p-4">
+
+    <h3>Final Review</h3>
+
+    <table class="table">
+        <tr>
+            <th>Booking ID</th>
+            <td>@Model.BookingId</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>@Model.ReservationDate</td>
+        </tr>
+        <tr>
+            <th>Time</th>
+            <td>@Model.ReservationTime</td>
+        </tr>
+        <tr>
+            <th>Guests</th>
+            <td>@Model.GuestCount</td>
+        </tr>
+        <tr>
+            <th>Table</th>
+            <td>@Model.TableNumber</td>
+        </tr>
+    </table>
+
+    <div class="alert alert-info">
+        Reservations may be cancelled up to 2 hours before dining time.
+    </div>
+
+    <div class="text-end">
+        <a class="btn btn-success"
+           asp-page="/Reservations/Confirmation">
+            Confirm Reservation
+        </a>
+    </div>
+
+</div>

@@ -1,0 +1,84 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Payments.CheckoutModel
+
+@{
+    Layout = "_Layout";
+
+    ViewData["Title"] = "Checkout";
+    ViewData["HeaderTitle"] = "Secure Checkout";
+    ViewData["HeaderSubtitle"] = "Review and complete your payment.";
+}
+
+<div class="row">
+
+    <div class="col-md-8">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+
+                <h4>Payment Details</h4>
+                <hr />
+
+                <div class="mb-3">
+                    <label class="form-label">Cardholder Name</label>
+                    <input asp-for="CardholderName" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Card Number</label>
+                    <input asp-for="CardNumber" class="form-control" />
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Expiry Date</label>
+                        <input asp-for="ExpiryDate" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">CVV</label>
+                        <input asp-for="CVV" class="form-control" />
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <h4>Order Summary</h4>
+
+                <hr />
+
+                <p>
+                    <strong>Order Ref:</strong>
+                    @Model.OrderReference
+                </p>
+
+                <p>
+                    <strong>Booking Ref:</strong>
+                    @Model.BookingReference
+                </p>
+
+                <p>
+                    <strong>Total Amount:</strong>
+                    RM @Model.TotalAmount
+                </p>
+
+                <button class="btn btn-primary w-100 mt-3">
+                    Pay Now
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

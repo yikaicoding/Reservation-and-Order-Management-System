@@ -1,0 +1,41 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Payments.PaymentSuccessModel
+
+@{
+    Layout = "_Layout";
+
+    ViewData["Title"] = "Payment Successful";
+    ViewData["HeaderTitle"] = "Payment Successful";
+    ViewData["HeaderSubtitle"] = "Your transaction has been completed.";
+}
+
+<div class="card shadow-sm text-center">
+
+    <div class="card-body p-5">
+
+        <div class="text-success display-1">
+            ✓
+        </div>
+
+        <h2>Payment Received</h2>
+
+        <p class="lead">
+
+            Transaction Reference
+
+            <br />
+
+            <strong>@Model.TransactionReference</strong>
+
+        </p>
+
+        <hr />
+
+        <a asp-page="/Payments/Receipt"
+           class="btn btn-primary">
+            View Receipt
+        </a>
+
+    </div>
+
+</div>

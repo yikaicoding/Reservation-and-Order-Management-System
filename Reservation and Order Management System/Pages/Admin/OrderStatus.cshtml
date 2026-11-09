@@ -1,0 +1,60 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Admin.OrderStatusModel
+
+@{
+    Layout = "_Layout";
+
+    ViewData["Title"] = "Order Status";
+    ViewData["HeaderTitle"] = "Kitchen Order Tracking";
+    ViewData["HeaderSubtitle"] = "Monitor order progression.";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h4>Order #@Model.OrderReference</h4>
+                <p class="text-muted mb-0">
+                    Reservation: @Model.ReservationReference
+                </p>
+            </div>
+
+            <div>
+                <span class="badge bg-primary">
+                    @Model.CurrentStatus
+                </span>
+            </div>
+
+        </div>
+
+        <div class="position-relative">
+
+            <div class="progress" style="height:8px;">
+                <div class="progress-bar"
+                     role="progressbar"
+                     style="width:@Model.ProgressPercentage%">
+                </div>
+            </div>
+
+            <div class="row text-center mt-4">
+
+                <div class="col">
+                    <div class="fw-bold">Preparing</div>
+                </div>
+
+                <div class="col">
+                    <div class="fw-bold">Ready</div>
+                </div>
+
+                <div class="col">
+                    <div class="fw-bold">Completed</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

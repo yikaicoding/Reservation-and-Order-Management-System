@@ -1,19 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Reservation_and_Order_Management_System.Models;
 
 namespace Reservation_and_Order_Management_System.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
+        public DbSet<RestaurantTable> RestaurantTables { get; set; }
+
         public DbSet<Customer> Customers { get; set; }
 
         public DbSet<Reservation> Reservations { get; set; }
 
         public DbSet<Review> Reviews { get; set; }
+
+        public DbSet<CustomerProfile> CustomerProfiles { get; set; }
+        
+        public DbSet<FoodOrder> FoodOrders { get; set; }
     }
 }
