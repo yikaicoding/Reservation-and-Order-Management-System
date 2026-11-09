@@ -1,0 +1,94 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Customer.SelectTableModel
+@{
+    ViewData["Title"] = "Pick Your Desired Table";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-center align-items-center mb-4 text-center">
+        <div class="badge rounded-circle bg-success text-white p-3 me-2">1</div> <span class="me-4 fw-semibold text-muted">Select Details</span>
+        <div class="badge rounded-circle bg-primary text-white p-3 me-2">2</div> <span class="me-4 fw-bold text-primary">Pick Table</span>
+        <div class="badge rounded-circle bg-secondary text-white p-3 me-2">3</div> <span class="me-4 text-muted">Preferences</span>
+        <div class="badge rounded-circle bg-secondary text-white p-3 me-2">4</div> <span class="text-muted">Confirm</span>
+    </div>
+
+    <h2 class="fw-bold text-primary mb-1">Pick your desired table.</h2>
+    <p class="text-muted mb-4">Select an available table in your preferred dining area.</p>
+
+    <form method="post">
+        <input type="hidden" asp-for="Date" />
+        <input type="hidden" asp-for="TimeSlot" />
+        <input type="hidden" asp-for="Guests" />
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3">Select a Table</h5>
+
+                    <div class="row g-3">
+                        @foreach (var table in Model.Tables)
+                        {
+                            bool isReserved = Model.ReservedTableIds.Contains(table.RestaurantTableId);
+                            bool isTooSmall = table.Capacity < Model.Guests;
+                            bool isDisabled = isReserved || isTooSmall;
+
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 position-relative">
+                                    <input type="radio" asp-for="SelectedTableId" value="@table.RestaurantTableId" class="btn-check" disabled="@(isDisabled ? "disabled" : null)" />
+                                    <div class="card h-100 text-center p-3 border-2 table-card @(isDisabled ? "bg-light text-muted border-secondary opacity-50" : "border-primary")">
+                                        <div class="fw-bold fs-5">T0@table.TableNumber</div>
+                                        <small class="text-muted">@table.Capacity seats</small>
+                                        <div class="mt-2">
+                                            @if (isReserved)
+                                            {
+                                                <span class="badge bg-secondary">Unavailable</span>
+                                            }
+                                            else if (isTooSmall)
+                                            {
+                                                <span class="badge bg-warning text-dark">Too Small</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary">Available</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 20px;">
+                    <h5 class="fw-bold mb-3">Booking Summary</h5>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Date</label>
+                        <strong>@Model.Date.ToString("D")</strong>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Time</label>
+                        <strong>@Model.TimeSlot</strong>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Guests</label>
+                        <strong>@Model.Guests people</strong>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning fw-bold py-2">Continue to Preferences</button>
+                        <a asp-page="/Customer/ReserveTable" class="btn btn-outline-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .btn-check:checked + .table-card {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #000 !important;
+    }
+</style>

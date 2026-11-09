@@ -4,80 +4,73 @@
     ViewData["Title"] = "Reserve a Table";
 }
 
-<div class="container py-4">
-    <!-- Hero Banner -->
-    <div class="p-4 mb-4 bg-primary text-white rounded-3 shadow-sm">
-        <h1 class="display-6 fw-bold">Skip the queue, just dine.</h1>
-        <p class="lead mb-0">Select your dining area, schedule date and time, and secure instant confirmation.</p>
+<div class="container-fluid px-0">
+    <div class="bg-primary text-white py-5 px-4 rounded-3 mb-5 shadow-sm">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-2">Skip the queue, just dine.</h1>
+            <p class="lead mb-4">Select your date, party size, and pick your preferred table in real time.</p>
+
+            <div class="card border-0 shadow-lg text-dark p-3">
+                <form method="get" asp-page="/Customer/SelectTable">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-muted">Dine-In Date</label>
+                            <input type="date" name="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-muted">Time Slot</label>
+                            <select name="timeSlot" class="form-select" required>
+                                <option value="06:00 PM - 08:00 PM">Dinner Session 1 (06:00 PM – 08:00 PM)</option>
+                                <option value="08:00 PM - 10:00 PM">Dinner Session 2 (08:00 PM – 10:00 PM)</option>
+                                <option value="12:00 PM - 02:00 PM">Lunch Session (12:00 PM – 02:00 PM)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-muted">No. of Pax</label>
+                            <input type="number" name="guests" class="form-control" value="2" min="1" max="20" required />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 text-dark">
+                                Find Availability
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 text-primary">Table Reservation Details</h5>
+    <div class="container pb-5">
+        <h3 class="fw-bold mb-3">Dining Areas Highlight</h3>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden">
+                    <div class="bg-secondary text-white text-center py-4" style="height: 160px; background: linear-gradient(135deg, #2c3e50, #4ca1af);">
+                        <h4 class="mt-4">Main Dining Hall</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted">Central air-conditioned dining area with cozy seating arrangements suitable for families and small groups.</p>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        <!-- Table Picker -->
-                        <div class="mb-3">
-                            <label asp-for="ReservationInput.RestaurantTableId" class="form-label fw-semibold">Choose Table &amp; Dining Area</label>
-                            <select asp-for="ReservationInput.RestaurantTableId" asp-items="Model.TableOptions" class="form-select">
-                                <option value="">-- Choose an Available Table --</option>
-                            </select>
-                            <span asp-validation-for="ReservationInput.RestaurantTableId" class="text-danger small"></span>
-                        </div>
-
-                        <div class="row">
-                            <!-- Date -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReservationInput.ReservationDate" class="form-label fw-semibold">Dining Date</label>
-                                <input asp-for="ReservationInput.ReservationDate" type="date" class="form-control" />
-                                <span asp-validation-for="ReservationInput.ReservationDate" class="text-danger small"></span>
-                            </div>
-
-                            <!-- Time Slot -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReservationInput.TimeSlot" class="form-label fw-semibold">Time Slot</label>
-                                <select asp-for="ReservationInput.TimeSlot" class="form-select">
-                                    <option value="12:00 - 14:00">Lunch (12:00 PM – 02:00 PM)</option>
-                                    <option value="18:00 - 20:00">Dinner Session 1 (06:00 PM – 08:00 PM)</option>
-                                    <option value="20:00 - 22:00">Dinner Session 2 (08:00 PM – 10:00 PM)</option>
-                                </select>
-                                <span asp-validation-for="ReservationInput.TimeSlot" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Guest Count -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReservationInput.NumberOfGuests" class="form-label fw-semibold">Number of Guests</label>
-                                <input asp-for="ReservationInput.NumberOfGuests" type="number" min="1" max="20" class="form-control" />
-                                <span asp-validation-for="ReservationInput.NumberOfGuests" class="text-danger small"></span>
-                            </div>
-
-                            <!-- Special Requests -->
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReservationInput.SpecialRequests" class="form-label fw-semibold">Special Request (Optional)</label>
-                                <input asp-for="ReservationInput.SpecialRequests" class="form-control" placeholder="e.g. Baby chair, Window seat" />
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Confirm Reservation</button>
-                        </div>
-                    </form>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden">
+                    <div class="bg-secondary text-white text-center py-4" style="height: 160px; background: linear-gradient(135deg, #11998e, #38ef7d);">
+                        <h4 class="mt-4">Garden Patio</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted">Open-air outdoor seating featuring evening breezes, ambient lighting, and scenic views.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden">
+                    <div class="bg-secondary text-white text-center py-4" style="height: 160px; background: linear-gradient(135deg, #8e2de2, #4a00e0);">
+                        <h4 class="mt-4">Private VIP Rooms</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted">Exclusive acoustic-isolated private rooms reserved for corporate meetings and large celebrations.</p>
+                    </div>
                 </div>
             </div>
         </div>
