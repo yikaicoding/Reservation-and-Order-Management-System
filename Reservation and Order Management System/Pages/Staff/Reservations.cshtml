@@ -1,0 +1,614 @@
+﻿@page
+@model Reservation_and_Order_Management_System.Pages.Staff.ReservationsModel
+@{
+    ViewData["Title"] = "Staff reservation portal";
+    ViewData["BodyClass"] = "staff-page";
+    var email = User.Identity?.Name ?? "Staff account";
+    var avatarLetter = string.IsNullOrWhiteSpace(email) ? "S" : email[..1].ToUpperInvariant();
+    var pendingCount = Model.Reservations.Count(x => x.Status == "Pending");
+    var confirmedCount = Model.Reservations.Count(x => x.Status == "Confirmed");
+    var todayCount = Model.Reservations.Count(x => x.StartsAt.Date == DateTime.Today && x.Status != "Cancelled");
+    var selectedStatus = Request.Query["status"].ToString();
+}
+@section Styles {
+    <style>
+            body.staff-page {
+            margin:0;
+                min-height:100vh;
+                background:#f3f6fb;
+                color:#17243a;
+                font-family:Inter,"Segoe UI",Arial,sans-serif;
+            }
+            .staff-app {
+            min-height:100vh;
+            }
+            .staff-sidebar {
+            position:fixed;
+                inset:0 auto 0 0;
+                z-index:5;
+                display:flex;
+                flex-direction:column;
+                width:236px;
+                padding:27px 17px 16px;
+                background:#fff;
+                border-right:1px solid #e8edf4;
+            }
+            .staff-brand {
+            display:flex;
+                align-items:center;
+                gap:9px;
+                margin:0 8px 46px;
+                color:#1255ce;
+                text-decoration:none;
+                font-size:21px;
+                font-weight:800;
+                letter-spacing:-.7px;
+            }
+            .staff-brand-mark {
+            display:grid;
+                width:29px;
+                height:29px;
+                place-items:center;
+                border:3px solid #2180ff;
+                border-radius:50%;
+                font-size:18px;
+            }
+            .staff-label {
+            margin:0 12px 10px;
+                color:#a3adbc;
+                font-size:9px;
+                font-weight:800;
+                letter-spacing:1.3px;
+            }
+            .staff-nav {
+            display:grid;
+                gap:5px;
+            }
+            .staff-nav a,.staff-logout button {
+            display:flex;
+                align-items:center;
+                gap:12px;
+                min-height:42px;
+                padding:0 12px;
+                border:0;
+                border-radius:9px;
+                background:transparent;
+                color:#526078;
+                text-decoration:none;
+                font-size:12px;
+                font-weight:600;
+            }
+            .staff-nav a:hover,.staff-logout button:hover {
+            background:#f2f6fd;
+                color:#1255ce;
+            }
+            .staff-nav a.active {
+            background:linear-gradient(105deg,#1c72f7,#0751c7);
+                color:#fff;
+                box-shadow:0 6px 14px #1664dd33;
+            }
+            .staff-icon {
+            display:inline-grid;
+                width:18px;
+                place-items:center;
+                color:#94a1b3;
+                font-size:17px;
+            }
+            .staff-nav .active .staff-icon {
+            color:#fff;
+            }
+            .staff-spacer {
+            flex:1;
+            }
+            .staff-user {
+            display:flex;
+                align-items:center;
+                gap:10px;
+                padding:14px 6px;
+                border-top:1px solid #edf0f5;
+            }
+            .staff-avatar {
+            display:grid;
+                width:34px;
+                height:34px;
+                flex:0 0 auto;
+                place-items:center;
+                border-radius:50%;
+                background:linear-gradient(145deg,#ffca9b,#b6785d);
+                color:white;
+                font-size:12px;
+                font-weight:800;
+            }
+            .staff-user-copy {
+            display:grid;
+                gap:3px;
+                min-width:0;
+            }
+            .staff-user-copy strong {
+            overflow:hidden;
+                color:#29364b;
+                font-size:11px;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+            }
+            .staff-user-copy small {
+            color:#929daf;
+                font-size:9px;
+            }
+            .staff-logout {
+            padding-top:8px;
+                border-top:1px solid #edf0f5;
+            }
+            .staff-logout button {
+            width:100%;
+                cursor:pointer;
+                text-align:left;
+            }
+            .staff-main {
+            width:calc(100% - 236px);
+                min-height:100vh;
+                margin-left:236px;
+                padding-bottom:35px;
+            }
+            .staff-hero {
+            position:relative;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:20px;
+                min-height:170px;
+                overflow:hidden;
+                padding:28px clamp(22px,4vw,55px);
+                background:linear-gradient(112deg,#0756c7,#116be9 58%,#0757c9);
+                color:#fff;
+            }
+            .staff-hero-copy {
+            position:relative;
+                z-index:1;
+            }
+            .staff-eyebrow {
+            margin:0 0 10px;
+                color:#dceaff;
+                font-size:10px;
+                font-weight:800;
+                letter-spacing:1.2px;
+                text-transform:uppercase;
+            }
+            .staff-hero h1 {
+            margin:0 0 7px;
+                font-size:clamp(26px,3vw,36px);
+                font-weight:750;
+                letter-spacing:-1.4px;
+            }
+            .staff-hero p {
+            margin:0;
+                color:#e4efff;
+                font-size:12px;
+            }
+            .staff-hero-chip {
+            position:relative;
+                z-index:1;
+                padding:10px 15px;
+                border:1px solid #ffffff42;
+                border-radius:12px;
+                background:#ffffff18;
+                font-size:11px;
+                font-weight:700;
+            }
+            .staff-content {
+            max-width:1500px;
+                margin:0 auto;
+                padding:24px clamp(18px,3vw,42px) 55px;
+            }
+            .staff-alert {
+            margin:0 0 18px;
+                padding:12px 15px;
+                border:1px solid #bce5cc;
+                border-radius:10px;
+                background:#effaf3;
+                color:#17683a;
+                font-size:12px;
+            }
+            .staff-validation:empty {
+            display:none;
+            }
+            .staff-validation:not(:empty) {
+            margin-bottom:16px;
+                padding:12px 15px;
+                border:1px solid #f2c7c5;
+                border-radius:10px;
+                background:#fff5f5;
+                color:#a83530;
+                font-size:12px;
+            }
+            .staff-stats {
+            display:grid;
+                grid-template-columns:repeat(3,minmax(0,1fr));
+                gap:14px;
+                margin-bottom:23px;
+            }
+            .staff-stat {
+            padding:17px 19px;
+                border:1px solid #e9edf4;
+                border-radius:13px;
+                background:#fff;
+                box-shadow:0 7px 20px #21395808;
+            }
+            .staff-stat span {
+            display:block;
+                margin-bottom:7px;
+                color:#8793a6;
+                font-size:10px;
+                font-weight:700;
+                letter-spacing:.5px;
+                text-transform:uppercase;
+            }
+            .staff-stat strong {
+            color:#18304f;
+                font-size:25px;
+                font-weight:750;
+            }
+            .staff-section-head {
+            display:flex;
+                flex-wrap:wrap;
+                align-items:end;
+                justify-content:space-between;
+                gap:12px;
+                margin:0 0 13px;
+            }
+            .staff-section-head h2 {
+            margin:0 0 4px;
+                color:#202d40;
+                font-size:17px;
+                font-weight:750;
+            }
+            .staff-section-head p {
+            margin:0;
+                color:#8b96a7;
+                font-size:10px;
+            }
+            .staff-filter {
+            display:flex;
+                align-items:center;
+                gap:8px;
+                color:#68758a;
+                font-size:11px;
+            }
+            .staff-filter select {
+            min-width:155px;
+                padding:8px 30px 8px 11px;
+                border:1px solid #dce3ed;
+                border-radius:8px;
+                background:#fff;
+                color:#34445c;
+                font:inherit;
+            }
+            .staff-table-wrap {
+            overflow:hidden;
+                border:1px solid #e7ebf2;
+                border-radius:13px;
+                background:#fff;
+                box-shadow:0 8px 22px #21395808;
+            }
+            .staff-table-scroll {
+            overflow-x:auto;
+            }
+            .staff-table {
+            width:100%;
+                border-collapse:collapse;
+                font-size:11px;
+            }
+            .staff-table th {
+            padding:12px 14px;
+                background:#f8fafd;
+                color:#8995a8;
+                font-size:9px;
+                font-weight:800;
+                letter-spacing:.6px;
+                text-align:left;
+                text-transform:uppercase;
+                white-space:nowrap;
+            }
+            .staff-table td {
+            padding:13px 14px;
+                border-top:1px solid #edf0f5;
+                color:#46556b;
+                vertical-align:middle;
+            }
+            .staff-customer strong {
+            display:block;
+                color:#26364d;
+                font-size:11px;
+            }
+            .staff-customer small,.staff-booking-id {
+            display:block;
+                margin-top:3px;
+                color:#94a0b1;
+                font-size:9px;
+            }
+            .staff-status {
+            display:inline-flex;
+                align-items:center;
+                gap:6px;
+                padding:5px 9px;
+                border-radius:20px;
+                font-size:9px;
+                font-weight:800;
+                white-space:nowrap;
+            }
+            .staff-status:before {
+            width:6px;
+                height:6px;
+                border-radius:50%;
+                background:currentColor;
+                content:"";
+            }
+            .staff-status.pending {
+            background:#fff5df;
+                color:#ad7410;
+            }
+            .staff-status.confirmed {
+            background:#eaf8f0;
+                color:#21804c;
+            }
+            .staff-status.cancelled {
+            background:#eff1f4;
+                color:#778295;
+            }
+            .staff-actions {
+            display:flex;
+                flex-wrap:wrap;
+                gap:6px;
+                min-width:185px;
+            }
+            .staff-btn {
+            display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                min-height:30px;
+                padding:0 10px;
+                border:1px solid transparent;
+                border-radius:7px;
+                font:inherit;
+                font-size:9px;
+                font-weight:750;
+                text-decoration:none;
+                cursor:pointer;
+            }
+            .staff-btn-confirm {
+            background:#eaf8f0;
+                color:#21804c;
+            }
+            .staff-btn-edit {
+            border-color:#d6e4fa;
+                background:#f4f8ff;
+                color:#2769cc;
+            }
+            .staff-btn-cancel {
+            border-color:#f0d4d2;
+                background:#fffafa;
+                color:#b84640;
+            }
+            .staff-edit-row td {
+            padding:0;
+                background:#f8fafd;
+            }
+            .staff-edit-form {
+            display:grid;
+                grid-template-columns:1.25fr .65fr 1fr auto;
+                align-items:end;
+                gap:12px;
+                padding:17px;
+            }
+            .staff-edit-form label {
+            display:block;
+                margin-bottom:6px;
+                color:#69778c;
+                font-size:9px;
+                font-weight:750;
+            }
+            .staff-edit-form input,.staff-edit-form select {
+            width:100%;
+                min-height:35px;
+                box-sizing:border-box;
+                padding:7px 9px;
+                border:1px solid #dce3ed;
+                border-radius:7px;
+                background:#fff;
+                color:#34445c;
+                font:inherit;
+                font-size:10px;
+            }
+            .staff-edit-hint {
+            grid-column:1/-1;
+                margin:0;
+                color:#929daf;
+                font-size:9px;
+            }
+            .staff-btn-save {
+            min-height:35px;
+                padding:0 14px;
+                background:#1768e8;
+                color:#fff;
+            }
+            .staff-empty {
+            padding:48px 18px;
+                text-align:center;
+            }
+            .staff-empty-icon {
+            display:grid;
+                width:46px;
+                height:46px;
+                margin:0 auto 12px;
+                place-items:center;
+                border-radius:50%;
+                background:#edf4ff;
+                color:#1768e8;
+                font-size:20px;
+            }
+            .staff-empty h3 {
+            margin:0 0 5px;
+                color:#26364d;
+                font-size:14px;
+            }
+            .staff-empty p {
+            margin:0;
+                color:#929daf;
+                font-size:10px;
+            }
+            @@media(max-width:850px) {
+            .staff-sidebar {
+            width:195px
+            }
+            .staff-main {
+            width:calc(100% - 195px);
+                margin-left:195px
+            }
+            .staff-table {
+            min-width:760px
+            }
+            .staff-edit-form {
+            grid-template-columns:1fr 1fr
+            }
+            .staff-edit-hint {
+            grid-column:1/-1
+            }
+            
+            }
+            @@media(max-width:600px) {
+            .staff-sidebar {
+            width:60px;
+                padding:16px 8px;
+                align-items:center
+            }
+            .staff-brand {
+            margin:0 0 30px;
+                font-size:0
+            }
+            .staff-label,.staff-nav a>span:not(.staff-icon),.staff-user {
+            display:none
+            }
+            .staff-nav {
+            width:100%
+            }
+            .staff-nav a,.staff-logout button {
+            justify-content:center;
+                padding:0
+            }
+            .staff-nav a {
+            font-size:0
+            }
+            .staff-main {
+            width:calc(100% - 60px);
+                margin-left:60px
+            }
+            .staff-hero {
+            min-height:145px;
+                padding:22px 16px
+            }
+            .staff-hero-chip {
+            display:none
+            }
+            .staff-content {
+            padding:18px 12px 35px
+            }
+            .staff-stats {
+            gap:7px
+            }
+            .staff-stat {
+            padding:12px 10px
+            }
+            .staff-stat strong {
+            font-size:20px
+            }
+            .staff-stat span {
+            font-size:8px
+            }
+            .staff-edit-form {
+            grid-template-columns:1fr
+            }
+            .staff-edit-hint {
+            grid-column:auto
+            }
+            
+            }
+        </style>
+}
+<div class="staff-app">
+    <aside class="staff-sidebar" aria-label="Staff navigation">
+        <a class="staff-brand" asp-page="/Index" aria-label="Q Dine home"><span class="staff-brand-mark">Q</span><span>Q<span style="font-weight:500">Dine</span></span></a>
+        <div class="staff-label">STAFF WORKSPACE</div>
+        <nav class="staff-nav">
+            <a asp-page="/Index"><span class="staff-icon">&#8962;</span><span>Home</span></a>
+            <a class="active" asp-page="/Staff/Reservations" aria-current="page"><span class="staff-icon">&#9638;</span><span>Reservations</span></a>
+            <a asp-page="/Orders/Create"><span class="staff-icon">&#9827;</span><span>Orders</span></a>
+            <a asp-page="/Reservations/Create"><span class="staff-icon">&#8592;</span><span>Customer booking</span></a>
+        </nav>
+        <div class="staff-spacer"></div>
+        <div class="staff-user"><span class="staff-avatar">@avatarLetter</span><span class="staff-user-copy"><strong>@email</strong><small>@(User.IsInRole("Admin") ? "Administrator" : "Staff account")</small></span></div>
+        <form method="post" asp-page="/Account/Logout" class="staff-logout"><button type="submit"><span class="staff-icon">&#8618;</span><span>Log out</span></button></form>
+    </aside>
+    <main class="staff-main">
+        <header class="staff-hero"><div class="staff-hero-copy"><div class="staff-eyebrow">Q Dine · STAFF OPERATIONS</div><h1>Reservation portal</h1><p>Keep every booking on track, from confirmation to table assignment.</p></div><div class="staff-hero-chip">&#9679; Live reservation desk</div></header>
+        <div class="staff-content">
+            @if (TempData["Message"] is string message) { <div class="staff-alert" role="status">@message</div> }
+            <div asp-validation-summary="All" class="staff-validation"></div>
+            <section class="staff-stats" aria-label="Reservation summary">
+                <div class="staff-stat"><span>Pending confirmation</span><strong>@pendingCount</strong></div>
+                <div class="staff-stat"><span>Confirmed</span><strong>@confirmedCount</strong></div>
+                <div class="staff-stat"><span>Today</span><strong>@todayCount</strong></div>
+            </section>
+            <div class="staff-section-head"><div><h2>Reservations</h2><p>Review guest details and manage their booking.</p></div>
+                <form method="get" class="staff-filter"><label for="status-filter">Show</label><select id="status-filter" name="status" onchange="this.form.submit()">
+                    <option value="All" selected="@(string.IsNullOrEmpty(selectedStatus) || selectedStatus == "All")">All reservations</option>
+                    <option value="Pending" selected="@(selectedStatus == "Pending")">Pending</option>
+                    <option value="Confirmed" selected="@(selectedStatus == "Confirmed")">Confirmed</option>
+                    <option value="Cancelled" selected="@(selectedStatus == "Cancelled")">Cancelled</option>
+                </select></form>
+            </div>
+            <div class="staff-table-wrap">
+                @if (Model.Reservations.Count == 0)
+                {
+                    <div class="staff-empty"><span class="staff-empty-icon">&#9638;</span><h3>No reservations found</h3><p>Bookings will appear here when customers submit them.</p></div>
+                }
+                else
+                {
+                    <div class="staff-table-scroll"><table class="staff-table">
+                        <thead><tr><th>Customer</th><th>Date &amp; time</th><th>Party</th><th>Table</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                        @foreach (var reservation in Model.Reservations)
+                        {
+                            var statusClass = reservation.Status.ToLowerInvariant();
+                            <tr>
+                                <td class="staff-customer"><strong>@(reservation.CustomerProfile?.FullName ?? "Customer")</strong><small>@(reservation.CustomerProfile?.Email ?? "")</small><span class="staff-booking-id">Booking #@reservation.ReservationId</span></td>
+                                <td>@reservation.StartsAt.ToString("ddd, dd MMM yyyy · h:mm tt")</td><td>@reservation.PartySize guests</td><td>@(reservation.RestaurantTable?.TableName ?? "Unassigned")</td>
+                                <td><span class="staff-status @statusClass">@reservation.Status</span></td>
+                                <td><div class="staff-actions">
+                                    @if (reservation.Status == "Pending") { <form method="post" asp-page-handler="Confirm" asp-route-id="@reservation.ReservationId"><button class="staff-btn staff-btn-confirm" type="submit">Confirm</button></form> }
+                                    @if (reservation.Status is "Pending" or "Confirmed")
+                                    {
+                                        <button class="staff-btn staff-btn-edit" type="button" data-bs-toggle="collapse" data-bs-target="#edit-@reservation.ReservationId">Modify</button>
+                                        <form method="post" asp-page-handler="Cancel" asp-route-id="@reservation.ReservationId" onsubmit="return confirm('Cancel this reservation?');"><button class="staff-btn staff-btn-cancel" type="submit">Cancel</button></form>
+                                    }
+                                </div></td>
+                            </tr>
+                            @if (reservation.Status is "Pending" or "Confirmed")
+                            {
+                                <tr class="staff-edit-row"><td colspan="6"><div class="collapse" id="edit-@reservation.ReservationId"><form method="post" asp-page-handler="Modify" class="staff-edit-form">
+                                    <input type="hidden" name="Input.ReservationId" value="@reservation.ReservationId" />
+                                    <div><label for="starts-@reservation.ReservationId">Date &amp; time</label><input id="starts-@reservation.ReservationId" name="Input.StartsAt" type="datetime-local" value="@reservation.StartsAt.ToString("yyyy-MM-ddTHH:mm")" required /></div>
+                                    <div><label for="party-@reservation.ReservationId">Party size</label><input id="party-@reservation.ReservationId" name="Input.PartySize" type="number" min="1" max="20" value="@reservation.PartySize" required /></div>
+                                    <div><label for="table-@reservation.ReservationId">Assign table</label><select id="table-@reservation.ReservationId" name="Input.RestaurantTableId" required>@foreach (var table in Model.Tables) { <option value="@table.RestaurantTableId" selected="@(table.RestaurantTableId == reservation.RestaurantTableId)">@table.TableName · seats @table.Capacity</option> }</select></div>
+                                    <button class="staff-btn staff-btn-save" type="submit">Save changes</button>
+                                    <p class="staff-edit-hint">Two hour booking · table capacity and time conflicts are checked before saving.</p>
+                                </form></div></td></tr>
+                            }
+                        }
+                        </tbody>
+                    </table></div>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+
