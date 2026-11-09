@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Reservation_and_Order_Management_System.Data
 {
@@ -38,6 +39,23 @@ namespace Reservation_and_Order_Management_System.Data
                     await userManager.AddToRoleAsync(newAdmin, "Admin");
                 }
             }
+
+            // Existing profile-backed accounts are customer accounts too.
+            var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            var customerIds = await db.CustomerProfiles
+                .Select(profile => profile.CustomerId)
+                .ToListAsync();
+
+            foreach (var customerId in customerIds)
+            {
+                var customer = await userManager.FindByIdAsync(customerId);
+                if (customer is not null && !await userManager.IsInRoleAsync(customer, "Customer"))
+                {
+                    await userManager.AddToRoleAsync(customer, "Customer");
+                }
+            }
         }
     }
 }
+
+

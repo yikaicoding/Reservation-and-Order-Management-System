@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace Reservation_and_Order_Management_System.Pages.Orders;
 
-[Authorize]
+[Authorize(Roles = "Customer")]
 public class CreateModel(ApplicationDbContext db) : PageModel
 {
     [BindProperty, Range(1, int.MaxValue)]
@@ -125,5 +125,6 @@ public class CreateModel(ApplicationDbContext db) : PageModel
         public int Quantity { get; set; } = 1;
     }
 }
+
 
 

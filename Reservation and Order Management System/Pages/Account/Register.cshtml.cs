@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +49,16 @@ public class RegisterModel(
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
 
+            return Page();
+        }
+
+        var roleResult = await users.AddToRoleAsync(user, "Customer");
+        if (!roleResult.Succeeded)
+        {
+            foreach (var error in roleResult.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            await users.DeleteAsync(user);
             return Page();
         }
 
